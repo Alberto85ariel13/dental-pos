@@ -1,0 +1,271 @@
+.call-center-page {
+  max-width: 1400px;
+}
+
+.call-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.call-status-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.calls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.call-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 20px;
+  transition: all 0.3s;
+}
+
+.call-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.call-info-section {
+  flex: 1;
+}
+
+.call-patient {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.call-patient h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.patient-num {
+  font-size: 14px;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.call-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.status-badge-call {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+
+.call-actions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.btn.playing {
+  background: #ff4757;
+}
+
+.btn-info {
+  background: #2196f3;
+  color: white;
+}
+
+.btn-info:hover {
+  background: #1976d2;
+}
+
+.next-action-badge {
+  padding: 10px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1565c0;
+  text-align: center;
+}
+
+.call-patient-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.call-options {
+  background: #e8f5e9;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.call-options h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2e7d32;
+  margin-bottom: 12px;
+}
+
+.call-options ul {
+  list-style: none;
+  padding: 0;
+}
+
+.call-options li {
+  padding: 6px 0;
+  font-size: 14px;
+  color: #2e7d32;
+}
+
+.call-detail-header {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.ai-summary-section {
+  margin-bottom: 20px;
+}
+
+.ai-summary-section h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.ai-summary-box {
+  background: #e3f2fd;
+  padding: 20px;
+  border-radius: 10px;
+  border-left: 4px solid #2196f3;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1565c0;
+}
+
+.transcript-section {
+  margin-bottom: 20px;
+}
+
+.transcript-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.transcript-header h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.transcript-box {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #333;
+  white-space: pre-wrap;
+  font-family: 'Courier New', monospace;
+}
+
+.outcome-section {
+  background: #fff3e0;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.outcome-section h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e65100;
+  margin-bottom: 15px;
+}
+
+.outcome-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.outcome-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #ffe0b2;
+}
+
+.outcome-item:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .call-card {
+    flex-direction: column;
+  }
+  
+  .call-actions-section {
+    width: 100%;
+  }
+  
+  .call-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
