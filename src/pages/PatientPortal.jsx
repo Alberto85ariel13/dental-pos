@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Calendar, Clock, DollarSign, FileText, MessageSquare, User, Bell, LogOut, CreditCard, Plus, Video, Search, CheckCircle, Users, Home, Send, Edit, X, Star, TrendingUp, CheckSquare, Mail, Smartphone, AlertTriangle, RefreshCw, Filter, ChevronRight } from 'lucide-react';
+import { patientPortalMockApi } from '../services/mockPatientPortalApi';
 
 const DentalManagementSystem = () => {
   const [currentView, setCurrentView] = useState('patient-portal');
@@ -13,98 +14,76 @@ const DentalManagementSystem = () => {
   const [selectedProvider, setSelectedProvider] = useState('all');
   const [scheduleView, setScheduleView] = useState('today');
   const [slotDuration, setSlotDuration] = useState(30);
+  const [patientData, setPatientData] = useState(null);
+  const [officeData, setOfficeData] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [claims, setClaims] = useState([]);
+  const [providers, setProviders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [savedCards] = useState([
     { id: 1, last4: '4242', brand: 'Visa', expiry: '12/26', isDefault: true, status: 'active' },
     { id: 2, last4: '5555', brand: 'Mastercard', expiry: '03/27', isDefault: false, status: 'failed' }
   ]);
-  
-  const patientData = {
-    name: "Sarah Johnson",
-    balance: 385.00,
-    nextAppointment: {
-      date: "Oct 25, 2025",
-      time: "10:30 AM",
-      provider: "Dr. Michael Chen",
-      type: "Routine Checkup",
-      estimatedCost: 150
-    },
-    claims: [
-      { id: 1, date: "Sep 15, 2025", procedure: "Root Canal", amount: 1200, insurancePaid: 900, patientOwes: 300, status: "partially_covered", reason: "Insurance covered 75% - maximum benefit reached" },
-      { id: 2, date: "Aug 20, 2025", procedure: "Crown", amount: 150, insurancePaid: 65, patientOwes: 85, status: "pending", reason: "Claim pending insurance review - expected response in 7 days" }
-    ],
-    autopayEnrolled: true,
-    autopayFailing: true,
-    failedPaymentReason: "Card expired - please update payment method",
-    messages: [
-      { id: 1, from: "Dr. Chen's Office", subject: "Appointment Confirmation", message: "Your appointment is confirmed for Oct 25 at 10:30 AM", date: "Oct 18, 2025", time: "2:30 PM", unread: true },
-      { id: 2, from: "Billing Department", subject: "Payment Received", message: "Thank you for your payment of $150", date: "Oct 15, 2025", time: "11:00 AM", unread: true },
-      { id: 3, from: "Dr. Chen's Office", subject: "Insurance Update", message: "Your insurance claim has been processed", date: "Oct 10, 2025", time: "3:45 PM", unread: false }
-    ],
-    upcomingRecommendations: [
-      { id: 1, type: "6-Month Cleaning", dueDate: "Nov 15, 2025", provider: "Dr. Chen", priority: "high" },
-      { id: 2, type: "Annual Checkup", dueDate: "Dec 1, 2025", provider: "Dr. Park", priority: "medium" }
-    ]
-  };
 
-  const providers = [
-    { id: 1, name: "Dr. Michael Chen", specialty: "General Dentistry", slotDuration: 30, color: "blue" },
-    { id: 2, name: "Dr. Lisa Park", specialty: "Orthodontics", slotDuration: 60, color: "purple" }
-  ];
+  useEffect(() => {
+    let isMounted = true;
 
-  const generateTestAppointments = (day) => {
-    const patients = ["Sarah Johnson", "John Smith", "Maria Garcia", "David Brown", "Emily Wilson", "Robert Taylor", "Lisa Anderson", "Michael Lee", "Jessica Martinez", "Christopher Davis", "Amanda Rodriguez", "Daniel Thompson", "Michelle White", "James Harris", "Karen Clark", "Steven Lewis", "Nancy Walker", "Kevin Young", "Laura Hall", "Brian Allen"];
-    const types = ["Checkup", "Cleaning", "Filling", "Crown", "Root Canal", "Extraction", "Consultation", "Emergency", "Follow-up", "Whitening"];
-    const statuses = ["scheduled", "confirmed", "waiting", "in-progress", "completed"];
-    const reasons = ["6-month checkup", "Tooth pain", "Cavity filling", "Crown placement", "Routine cleaning", "Consultation", "Emergency visit", "Follow-up visit"];
-    
-    const appointments = [];
-    const baseHour = 9;
-    const slots = 20;
-    
-    for (let i = 0; i < slots; i++) {
-      const hour = baseHour + Math.floor(i / 2);
-      const minute = (i % 2) * 30;
-      const time = `${hour > 12 ? hour - 12 : hour}:${minute.toString().padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`;
-      const provider = providers[Math.floor(Math.random() * providers.length)];
-      
-      appointments.push({
-        id: day === 'tomorrow' ? i + 100 : i,
-        time,
-        patient: patients[i % patients.length],
-        provider: provider.name,
-        providerColor: provider.color,
-        type: types[Math.floor(Math.random() * types.length)],
-        status: day === 'tomorrow' ? 'scheduled' : statuses[Math.floor(Math.random() * statuses.length)],
-        room: statuses[2] === 'waiting' || statuses[3] === 'in-progress' ? `Room ${Math.floor(Math.random() * 4) + 1}` : null,
-        reason: reasons[Math.floor(Math.random() * reasons.length)],
-        estimatedCost: Math.floor(Math.random() * 1000) + 100,
-        paymentStatus: Math.random() > 0.5 ? 'paid' : 'pending'
-      });
-    }
-    
-    return appointments;
-  };
+    const loadMockData = async () => {
+      const snapshot = await patientPortalMockApi.getPatientPortalSnapshot();
 
-  const officeData = {
-    todayAppointments: generateTestAppointments('today'),
-    tomorrowAppointments: generateTestAppointments('tomorrow'),
-    openRequests: [
-      { id: 1, patient: "Angela Martinez", requestedDate: "Oct 25, 2025", preferredTime: "Morning", type: "Cleaning", requestDate: "Oct 18, 2025", phone: "(555) 123-4567" },
-      { id: 2, patient: "Thomas Wright", requestedDate: "Oct 26, 2025", preferredTime: "Afternoon", type: "Consultation", requestDate: "Oct 19, 2025", phone: "(555) 234-5678" },
-      { id: 3, patient: "Rebecca Hill", requestedDate: "Oct 27, 2025", preferredTime: "Any", type: "Emergency", requestDate: "Oct 19, 2025", phone: "(555) 345-6789", urgent: true }
-    ],
-    rooms: [
-      { id: 1, name: "Room 1", status: "occupied", patient: "John Smith" },
-      { id: 2, name: "Room 2", status: "available", patient: null },
-      { id: 3, name: "Room 3", status: "cleaning", patient: null },
-      { id: 4, name: "Room 4", status: "available", patient: null }
-    ],
-    stats: { todayAppointments: 20, checkedIn: 12, completed: 8, revenue: 4850, openRequests: 3 },
-    recommendations: [
-      { id: 1, patient: "Sarah Johnson", type: "6-Month Cleaning", dueDate: "2025-11-15", lastVisit: "2025-05-15", priority: "high", status: "pending" },
-      { id: 2, patient: "John Smith", type: "Follow-up", dueDate: "2025-11-01", lastVisit: "2025-10-19", priority: "medium", status: "pending" }
-    ]
-  };
+      if (!isMounted) return;
+
+      setPatientData(snapshot.patient);
+      setOfficeData(snapshot.office);
+      setAppointments(snapshot.appointments);
+      setClaims(snapshot.claims);
+      setProviders(snapshot.providers);
+      setIsLoading(false);
+    };
+
+    loadMockData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setOfficeData(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        stats: patientPortalMockApi.computeStats(appointments, prev.openRequests),
+      };
+    });
+  }, [appointments]);
+
+  useEffect(() => {
+    setPatientData(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        balance: patientPortalMockApi.computeBalance(claims),
+        nextAppointment: patientPortalMockApi.computeNextAppointment(appointments),
+      };
+    });
+  }, [appointments, claims]);
+
+  const todayAppointments = useMemo(
+    () => appointments.filter(appointment => appointment.day === 'today'),
+    [appointments]
+  );
+
+  const tomorrowAppointments = useMemo(
+    () => appointments.filter(appointment => appointment.day === 'tomorrow'),
+    [appointments]
+  );
+
+  if (isLoading || !patientData || !officeData) {
+    return <div className="p-6 text-slate-500">Loading patient portal...</div>;
+  }
 
   const renderPatientOverview = () => (
     <div className="space-y-6">
@@ -360,13 +339,13 @@ const DentalManagementSystem = () => {
               onClick={() => setScheduleView('today')}
               className={`px-4 py-2 rounded-lg font-medium ${scheduleView === 'today' ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-700'}`}
             >
-              Today ({officeData.todayAppointments.length})
+              Today ({todayAppointments.length})
             </button>
             <button
               onClick={() => setScheduleView('tomorrow')}
               className={`px-4 py-2 rounded-lg font-medium ${scheduleView === 'tomorrow' ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-700'}`}
             >
-              Tomorrow ({officeData.tomorrowAppointments.length})
+              Tomorrow ({tomorrowAppointments.length})
             </button>
             <button
               onClick={() => setScheduleView('requests')}
@@ -415,7 +394,7 @@ const DentalManagementSystem = () => {
                 </div>
               ))
             ) : (
-              (scheduleView === 'today' ? officeData.todayAppointments : officeData.tomorrowAppointments)
+              (scheduleView === 'today' ? todayAppointments : tomorrowAppointments)
                 .filter(apt => selectedProvider === 'all' || apt.provider === providers.find(p => p.id.toString() === selectedProvider)?.name)
                 .map(apt => (
                 <div key={apt.id} className="border rounded-lg p-3 hover:shadow-md transition-shadow">
@@ -538,7 +517,7 @@ const DentalManagementSystem = () => {
             <div>
               <h4 className="text-lg font-bold text-slate-800 mb-4">Claims & Charges</h4>
               <div className="space-y-4">
-                {patientData.claims.map(claim => (
+                {claims.map(claim => (
                   <div key={claim.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
