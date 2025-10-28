@@ -137,7 +137,7 @@ const DentalManagementSystem = () => {
 
       return {
         ...prev,
-        balance: patientPortalMockApi.computeBalance(claims),
+        balance: patientPortalMockApi.computeBalance(claims, appointments),
         nextAppointment: patientPortalMockApi.computeNextAppointment(appointments),
       };
     });

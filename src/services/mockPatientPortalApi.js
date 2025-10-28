@@ -237,8 +237,24 @@ const computeNextAppointment = (apptList = mockAppointments) => {
   };
 };
 
-const computeBalance = (claimList = mockClaims) =>
-  claimList.reduce((total, claim) => total + Number(claim.patientOwes ?? claim.patientResponsibility ?? 0), 0);
+const computeBalance = (claimList = mockClaims, appointmentList = mockAppointments) => {
+  const claimTotal = claimList.reduce((total, claim) => {
+    const amount = Number(claim.patientOwes ?? claim.patientResponsibility ?? claim.amount ?? 0);
+    return total + (Number.isFinite(amount) ? amount : 0);
+  }, 0);
+
+  const appointmentTotal = appointmentList.reduce((total, appointment) => {
+    const status = String(appointment.paymentStatus ?? '').toLowerCase();
+    if (status === 'paid') {
+      return total;
+    }
+
+    const cost = Number(appointment.estimatedCost ?? 0);
+    return total + (Number.isFinite(cost) ? cost : 0);
+  }, 0);
+
+  return claimTotal + appointmentTotal;
+};
 
 const buildPatientProfile = (patientRecord, patientAppointments, patientClaims) => {
   const baseProfile = clone(mockPatientProfile);
@@ -254,7 +270,7 @@ const buildPatientProfile = (patientRecord, patientAppointments, patientClaims) 
     lastVisit: patientRecord?.lastVisit ?? baseProfile.lastVisit ?? null,
     messages: clone(baseProfile.messages ?? []),
     upcomingRecommendations: clone(baseProfile.upcomingRecommendations ?? []),
-    balance: computeBalance(patientClaims),
+    balance: computeBalance(patientClaims, patientAppointments),
     nextAppointment: computeNextAppointment(patientAppointments),
     claims: clone(patientClaims),
   };
