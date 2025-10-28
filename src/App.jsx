@@ -36,7 +36,6 @@ function Layout({ children }) {
       minute: '2-digit'
     });
 
-  // 👇 Si está en /portal-patient, renderiza sin header ni nav
   if (isPortal) return <main className="main-content">{children}</main>;
 
   return (
@@ -55,7 +54,6 @@ function Layout({ children }) {
         <Link to="/calls" className="nav-tab">📞 Calls</Link>
         <Link to="/messages" className="nav-tab">💬 Messages</Link>
         <Link to="/settings" className="nav-tab">⚙️ Settings</Link>
-        <Link to={portalLink} className="nav-tab">⚙️ Patient Portal</Link>
       </nav>
 
       <main className="main-content">{children}</main>
