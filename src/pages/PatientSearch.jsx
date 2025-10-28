@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './PatientSearch.css';
 
 function PatientSearch() {
@@ -85,7 +86,9 @@ function PatientSearch() {
             >
               <div className="patient-header">
                 <div className="patient-name">
-                  {patient.fName} {patient.lName}
+                  <PatientLink patNum={patient.patNum} stopPropagation>
+                    {patient.fName} {patient.lName}
+                  </PatientLink>
                 </div>
                 <div className="patient-id">#{patient.patNum}</div>
               </div>
