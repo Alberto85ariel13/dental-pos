@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './Messages.css';
 
 function Messages() {
@@ -175,7 +176,15 @@ function Messages() {
                   </div>
                   <div className="conversation-info">
                     <div className="conversation-header">
-                      <span className="conversation-name">{conv.patientName || conv.phoneNumber}</span>
+                      <span className="conversation-name">
+                        {conv.patientName ? (
+                          <PatientLink patNum={conv.patNum} stopPropagation>
+                            {conv.patientName}
+                          </PatientLink>
+                        ) : (
+                          conv.phoneNumber
+                        )}
+                      </span>
                       <span className="conversation-time">{formatTime(conv.lastMessageTime)}</span>
                     </div>
                     <div className="conversation-preview">
@@ -208,7 +217,15 @@ function Messages() {
                     {selectedConversation.type === 'whatsapp' ? '💚' : '📱'}
                   </div>
                   <div>
-                    <h3>{selectedConversation.patientName || selectedConversation.phoneNumber}</h3>
+                    <h3>
+                      {selectedConversation.patientName ? (
+                        <PatientLink patNum={selectedConversation.patNum} stopPropagation>
+                          {selectedConversation.patientName}
+                        </PatientLink>
+                      ) : (
+                        selectedConversation.phoneNumber
+                      )}
+                    </h3>
                     <p className="header-phone">{selectedConversation.phoneNumber}</p>
                   </div>
                 </div>

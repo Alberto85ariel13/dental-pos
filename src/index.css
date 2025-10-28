@@ -50,3 +50,14 @@ input:focus, select:focus, textarea:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+a.patient-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a.patient-link:hover,
+a.patient-link:focus {
+  text-decoration: underline;
+}
