@@ -1,5 +1,45 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, Clock, DollarSign, FileText, MessageSquare, User, Bell, LogOut, CreditCard, Plus, Video, Search, CheckCircle, Users, Home, Send, Edit, X, Star, TrendingUp, CheckSquare, Mail, Smartphone, AlertTriangle, RefreshCw, Filter, ChevronRight } from 'lucide-react';
+import { patientPortalMockApi } from '../services/mockPatientPortalApi';
+
+const APPOINTMENT_TYPE_COSTS = {
+  'Routine Checkup': 150,
+  Cleaning: 180,
+  Filling: 220,
+  Crown: 950,
+};
+
+const getTimeSlots = (durationMinutes = 30) => {
+  const slots = [];
+  const startMinutes = 9 * 60;
+  const endMinutes = 17 * 60;
+
+  for (let minutes = startMinutes; minutes <= endMinutes - durationMinutes; minutes += durationMinutes) {
+    const hour24 = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const hour12 = ((hour24 + 11) % 12) + 1;
+    const meridiem = hour24 >= 12 ? 'PM' : 'AM';
+    const minuteStr = mins.toString().padStart(2, '0');
+    slots.push(`${hour12}:${minuteStr} ${meridiem}`);
+  }
+
+  return slots;
+};
+
+const determineDayLabel = (dateString) => {
+  const selectedDate = new Date(dateString);
+  if (Number.isNaN(selectedDate.getTime())) return 'upcoming';
+
+  const today = new Date();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startOfSelected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+  const diffInDays = Math.round((startOfSelected - startOfToday) / (1000 * 60 * 60 * 24));
+
+  if (diffInDays === 0) return 'today';
+  if (diffInDays === 1) return 'tomorrow';
+  if (diffInDays < 0) return 'past';
+  return 'upcoming';
+};
 
 const DentalManagementSystem = () => {
   const [currentView, setCurrentView] = useState('patient-portal');
@@ -13,98 +53,202 @@ const DentalManagementSystem = () => {
   const [selectedProvider, setSelectedProvider] = useState('all');
   const [scheduleView, setScheduleView] = useState('today');
   const [slotDuration, setSlotDuration] = useState(30);
+  const [appointmentForm, setAppointmentForm] = useState({
+    providerId: '',
+    type: 'Routine Checkup',
+    reason: '',
+    date: '',
+    time: '',
+    payNow: false,
+  });
+  const [appointmentError, setAppointmentError] = useState(null);
+  const [isBookingAppointment, setIsBookingAppointment] = useState(false);
+  const [patientData, setPatientData] = useState(null);
+  const [officeData, setOfficeData] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [claims, setClaims] = useState([]);
+  const [providers, setProviders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [savedCards] = useState([
     { id: 1, last4: '4242', brand: 'Visa', expiry: '12/26', isDefault: true, status: 'active' },
     { id: 2, last4: '5555', brand: 'Mastercard', expiry: '03/27', isDefault: false, status: 'failed' }
   ]);
-  
-  const patientData = {
-    name: "Sarah Johnson",
-    balance: 385.00,
-    nextAppointment: {
-      date: "Oct 25, 2025",
-      time: "10:30 AM",
-      provider: "Dr. Michael Chen",
-      type: "Routine Checkup",
-      estimatedCost: 150
-    },
-    claims: [
-      { id: 1, date: "Sep 15, 2025", procedure: "Root Canal", amount: 1200, insurancePaid: 900, patientOwes: 300, status: "partially_covered", reason: "Insurance covered 75% - maximum benefit reached" },
-      { id: 2, date: "Aug 20, 2025", procedure: "Crown", amount: 150, insurancePaid: 65, patientOwes: 85, status: "pending", reason: "Claim pending insurance review - expected response in 7 days" }
-    ],
-    autopayEnrolled: true,
-    autopayFailing: true,
-    failedPaymentReason: "Card expired - please update payment method",
-    messages: [
-      { id: 1, from: "Dr. Chen's Office", subject: "Appointment Confirmation", message: "Your appointment is confirmed for Oct 25 at 10:30 AM", date: "Oct 18, 2025", time: "2:30 PM", unread: true },
-      { id: 2, from: "Billing Department", subject: "Payment Received", message: "Thank you for your payment of $150", date: "Oct 15, 2025", time: "11:00 AM", unread: true },
-      { id: 3, from: "Dr. Chen's Office", subject: "Insurance Update", message: "Your insurance claim has been processed", date: "Oct 10, 2025", time: "3:45 PM", unread: false }
-    ],
-    upcomingRecommendations: [
-      { id: 1, type: "6-Month Cleaning", dueDate: "Nov 15, 2025", provider: "Dr. Chen", priority: "high" },
-      { id: 2, type: "Annual Checkup", dueDate: "Dec 1, 2025", provider: "Dr. Park", priority: "medium" }
-    ]
-  };
 
-  const providers = [
-    { id: 1, name: "Dr. Michael Chen", specialty: "General Dentistry", slotDuration: 30, color: "blue" },
-    { id: 2, name: "Dr. Lisa Park", specialty: "Orthodontics", slotDuration: 60, color: "purple" }
-  ];
+  useEffect(() => {
+    let isMounted = true;
 
-  const generateTestAppointments = (day) => {
-    const patients = ["Sarah Johnson", "John Smith", "Maria Garcia", "David Brown", "Emily Wilson", "Robert Taylor", "Lisa Anderson", "Michael Lee", "Jessica Martinez", "Christopher Davis", "Amanda Rodriguez", "Daniel Thompson", "Michelle White", "James Harris", "Karen Clark", "Steven Lewis", "Nancy Walker", "Kevin Young", "Laura Hall", "Brian Allen"];
-    const types = ["Checkup", "Cleaning", "Filling", "Crown", "Root Canal", "Extraction", "Consultation", "Emergency", "Follow-up", "Whitening"];
-    const statuses = ["scheduled", "confirmed", "waiting", "in-progress", "completed"];
-    const reasons = ["6-month checkup", "Tooth pain", "Cavity filling", "Crown placement", "Routine cleaning", "Consultation", "Emergency visit", "Follow-up visit"];
-    
-    const appointments = [];
-    const baseHour = 9;
-    const slots = 20;
-    
-    for (let i = 0; i < slots; i++) {
-      const hour = baseHour + Math.floor(i / 2);
-      const minute = (i % 2) * 30;
-      const time = `${hour > 12 ? hour - 12 : hour}:${minute.toString().padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`;
-      const provider = providers[Math.floor(Math.random() * providers.length)];
-      
-      appointments.push({
-        id: day === 'tomorrow' ? i + 100 : i,
-        time,
-        patient: patients[i % patients.length],
-        provider: provider.name,
-        providerColor: provider.color,
-        type: types[Math.floor(Math.random() * types.length)],
-        status: day === 'tomorrow' ? 'scheduled' : statuses[Math.floor(Math.random() * statuses.length)],
-        room: statuses[2] === 'waiting' || statuses[3] === 'in-progress' ? `Room ${Math.floor(Math.random() * 4) + 1}` : null,
-        reason: reasons[Math.floor(Math.random() * reasons.length)],
-        estimatedCost: Math.floor(Math.random() * 1000) + 100,
-        paymentStatus: Math.random() > 0.5 ? 'paid' : 'pending'
-      });
+    const loadMockData = async () => {
+      const snapshot = await patientPortalMockApi.getPatientPortalSnapshot();
+
+      if (!isMounted) return;
+
+      setPatientData(snapshot.patient);
+      setOfficeData(snapshot.office);
+      setAppointments(snapshot.appointments);
+      setClaims(snapshot.claims);
+      setProviders(snapshot.providers);
+      setIsLoading(false);
+    };
+
+    loadMockData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setOfficeData(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        stats: patientPortalMockApi.computeStats(appointments, prev.openRequests),
+      };
+    });
+  }, [appointments]);
+
+  useEffect(() => {
+    setPatientData(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        balance: patientPortalMockApi.computeBalance(claims),
+        nextAppointment: patientPortalMockApi.computeNextAppointment(appointments),
+      };
+    });
+  }, [appointments, claims]);
+
+  const initializeAppointmentForm = useCallback(() => {
+    const defaultProviderId = providers[0]?.id ? String(providers[0].id) : '';
+    const provider = providers.find(p => p.id === Number(defaultProviderId));
+    const providerSlotDuration = provider?.slotDuration ?? 30;
+    setSlotDuration(providerSlotDuration);
+    const slots = getTimeSlots(providerSlotDuration);
+
+    setAppointmentForm({
+      providerId: defaultProviderId,
+      type: 'Routine Checkup',
+      reason: '',
+      date: '',
+      time: slots[0] ?? '',
+      payNow: false,
+    });
+    setAppointmentError(null);
+  }, [providers]);
+
+  useEffect(() => {
+    if (providers.length > 0 && !appointmentForm.providerId) {
+      initializeAppointmentForm();
     }
-    
-    return appointments;
+  }, [providers, appointmentForm.providerId, initializeAppointmentForm]);
+
+  const openAppointmentModal = useCallback(() => {
+    initializeAppointmentForm();
+    setShowAppointmentModal(true);
+  }, [initializeAppointmentForm]);
+
+  const closeAppointmentModal = useCallback(() => {
+    setShowAppointmentModal(false);
+    setAppointmentError(null);
+    setIsBookingAppointment(false);
+    initializeAppointmentForm();
+  }, [initializeAppointmentForm]);
+
+  const handleAppointmentFieldChange = (field, value) => {
+    setAppointmentError(null);
+
+    if (field === 'providerId') {
+      const provider = providers.find(p => p.id === Number(value));
+      const providerSlotDuration = provider?.slotDuration ?? 30;
+      setSlotDuration(providerSlotDuration);
+      const slots = getTimeSlots(providerSlotDuration);
+      setAppointmentForm(prev => ({
+        ...prev,
+        providerId: value,
+        time: slots[0] ?? '',
+      }));
+      return;
+    }
+
+    if (field === 'payNow') {
+      setAppointmentForm(prev => ({
+        ...prev,
+        payNow: value,
+      }));
+      return;
+    }
+
+    setAppointmentForm(prev => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  const officeData = {
-    todayAppointments: generateTestAppointments('today'),
-    tomorrowAppointments: generateTestAppointments('tomorrow'),
-    openRequests: [
-      { id: 1, patient: "Angela Martinez", requestedDate: "Oct 25, 2025", preferredTime: "Morning", type: "Cleaning", requestDate: "Oct 18, 2025", phone: "(555) 123-4567" },
-      { id: 2, patient: "Thomas Wright", requestedDate: "Oct 26, 2025", preferredTime: "Afternoon", type: "Consultation", requestDate: "Oct 19, 2025", phone: "(555) 234-5678" },
-      { id: 3, patient: "Rebecca Hill", requestedDate: "Oct 27, 2025", preferredTime: "Any", type: "Emergency", requestDate: "Oct 19, 2025", phone: "(555) 345-6789", urgent: true }
-    ],
-    rooms: [
-      { id: 1, name: "Room 1", status: "occupied", patient: "John Smith" },
-      { id: 2, name: "Room 2", status: "available", patient: null },
-      { id: 3, name: "Room 3", status: "cleaning", patient: null },
-      { id: 4, name: "Room 4", status: "available", patient: null }
-    ],
-    stats: { todayAppointments: 20, checkedIn: 12, completed: 8, revenue: 4850, openRequests: 3 },
-    recommendations: [
-      { id: 1, patient: "Sarah Johnson", type: "6-Month Cleaning", dueDate: "2025-11-15", lastVisit: "2025-05-15", priority: "high", status: "pending" },
-      { id: 2, patient: "John Smith", type: "Follow-up", dueDate: "2025-11-01", lastVisit: "2025-10-19", priority: "medium", status: "pending" }
-    ]
+  const timeOptions = useMemo(() => getTimeSlots(slotDuration), [slotDuration]);
+  const selectedAppointmentCost = useMemo(
+    () => APPOINTMENT_TYPE_COSTS[appointmentForm.type] ?? 150,
+    [appointmentForm.type]
+  );
+
+  const handleBookAppointment = async () => {
+    if (!appointmentForm.providerId || !appointmentForm.date || !appointmentForm.time) {
+      setAppointmentError('Please select a provider, date, and time.');
+      return;
+    }
+
+    const providerId = Number(appointmentForm.providerId);
+    const provider = providers.find(p => p.id === providerId);
+
+    setIsBookingAppointment(true);
+    setAppointmentError(null);
+
+    try {
+      const newAppointment = await patientPortalMockApi.addAppointment({
+        patient: patientData.name,
+        providerId,
+        provider: provider?.name,
+        type: appointmentForm.type,
+        reason: appointmentForm.reason || appointmentForm.type,
+        date: appointmentForm.date,
+        time: appointmentForm.time,
+        day: determineDayLabel(appointmentForm.date),
+        status: 'scheduled',
+        room: null,
+        estimatedCost: selectedAppointmentCost,
+        paymentStatus: appointmentForm.payNow ? 'paid' : 'pending',
+      });
+
+      setAppointments(prev => {
+        const updated = [...prev, newAppointment];
+        return updated.sort(
+          (a, b) => new Date(`${a.date} ${a.time}`).getTime() - new Date(`${b.date} ${b.time}`).getTime()
+        );
+      });
+
+      closeAppointmentModal();
+    } catch (error) {
+      console.error('Failed to book appointment', error);
+      setAppointmentError('Unable to book appointment. Please try again.');
+    } finally {
+      setIsBookingAppointment(false);
+    }
   };
+
+  const todayAppointments = useMemo(
+    () => appointments.filter(appointment => appointment.day === 'today'),
+    [appointments]
+  );
+
+  const tomorrowAppointments = useMemo(
+    () => appointments.filter(appointment => appointment.day === 'tomorrow'),
+    [appointments]
+  );
+
+  if (isLoading || !patientData || !officeData) {
+    return <div className="p-6 text-slate-500">Loading patient portal...</div>;
+  }
 
   const renderPatientOverview = () => (
     <div className="space-y-6">
@@ -197,10 +341,10 @@ const DentalManagementSystem = () => {
                   </div>
                   <p className="text-sm text-slate-600">Due: {rec.dueDate}</p>
                 </div>
-                <button 
-                  onClick={() => setShowAppointmentModal(true)}
-                  className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
-                >
+                  <button
+                    onClick={openAppointmentModal}
+                    className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+                  >
                   Book Now
                 </button>
               </div>
@@ -246,7 +390,7 @@ const DentalManagementSystem = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <button onClick={() => setShowAppointmentModal(true)} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow text-center">
+        <button onClick={openAppointmentModal} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow text-center">
           <Plus className="w-8 h-8 text-teal-500 mx-auto mb-2" />
           <p className="text-sm font-medium text-slate-700">Book Appointment</p>
         </button>
@@ -346,7 +490,7 @@ const DentalManagementSystem = () => {
                 ))}
               </select>
               <button 
-                onClick={() => setShowAppointmentModal(true)}
+                onClick={openAppointmentModal}
                 className="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
@@ -360,13 +504,13 @@ const DentalManagementSystem = () => {
               onClick={() => setScheduleView('today')}
               className={`px-4 py-2 rounded-lg font-medium ${scheduleView === 'today' ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-700'}`}
             >
-              Today ({officeData.todayAppointments.length})
+              Today ({todayAppointments.length})
             </button>
             <button
               onClick={() => setScheduleView('tomorrow')}
               className={`px-4 py-2 rounded-lg font-medium ${scheduleView === 'tomorrow' ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-700'}`}
             >
-              Tomorrow ({officeData.tomorrowAppointments.length})
+              Tomorrow ({tomorrowAppointments.length})
             </button>
             <button
               onClick={() => setScheduleView('requests')}
@@ -398,8 +542,8 @@ const DentalManagementSystem = () => {
                       <p className="text-xs text-slate-500">Requested on {req.requestDate}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button 
-                        onClick={() => setShowAppointmentModal(true)}
+                      <button
+                        onClick={openAppointmentModal}
                         className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
                       >
                         Schedule
@@ -415,7 +559,7 @@ const DentalManagementSystem = () => {
                 </div>
               ))
             ) : (
-              (scheduleView === 'today' ? officeData.todayAppointments : officeData.tomorrowAppointments)
+              (scheduleView === 'today' ? todayAppointments : tomorrowAppointments)
                 .filter(apt => selectedProvider === 'all' || apt.provider === providers.find(p => p.id.toString() === selectedProvider)?.name)
                 .map(apt => (
                 <div key={apt.id} className="border rounded-lg p-3 hover:shadow-md transition-shadow">
@@ -538,7 +682,7 @@ const DentalManagementSystem = () => {
             <div>
               <h4 className="text-lg font-bold text-slate-800 mb-4">Claims & Charges</h4>
               <div className="space-y-4">
-                {patientData.claims.map(claim => (
+                {claims.map(claim => (
                   <div key={claim.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
@@ -615,7 +759,7 @@ const DentalManagementSystem = () => {
         <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div className="p-6 border-b flex items-center justify-between sticky top-0 bg-white">
             <h3 className="text-2xl font-bold text-slate-800">Book Appointment</h3>
-            <button onClick={() => setShowAppointmentModal(false)} className="p-2 hover:bg-slate-100 rounded-lg">
+            <button onClick={closeAppointmentModal} className="p-2 hover:bg-slate-100 rounded-lg">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -623,38 +767,63 @@ const DentalManagementSystem = () => {
           <div className="p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Provider</label>
-              <select className="w-full px-4 py-2 border rounded-lg">
+              <select
+                value={appointmentForm.providerId}
+                onChange={(e) => handleAppointmentFieldChange('providerId', e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg"
+              >
+                <option value="" disabled>Select provider</option>
                 {providers.map(p => (
-                  <option key={p.id}>{p.name} - {p.specialty}</option>
+                  <option key={p.id} value={p.id}>{p.name} - {p.specialty}</option>
                 ))}
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Appointment Type</label>
-              <select className="w-full px-4 py-2 border rounded-lg">
-                <option>Routine Checkup</option>
-                <option>Cleaning</option>
-                <option>Filling</option>
-                <option>Crown</option>
+              <select
+                value={appointmentForm.type}
+                onChange={(e) => handleAppointmentFieldChange('type', e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg"
+              >
+                {Object.keys(APPOINTMENT_TYPE_COSTS).map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Reason for Visit</label>
-              <textarea rows="3" className="w-full px-4 py-2 border rounded-lg" placeholder="Describe reason..."></textarea>
+              <textarea
+                rows="3"
+                value={appointmentForm.reason}
+                onChange={(e) => handleAppointmentFieldChange('reason', e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg"
+                placeholder="Describe reason..."
+              ></textarea>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
-                <input type="date" className="w-full px-4 py-2 border rounded-lg" />
+                <input
+                  type="date"
+                  value={appointmentForm.date}
+                  onChange={(e) => handleAppointmentFieldChange('date', e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Time</label>
-                <select className="w-full px-4 py-2 border rounded-lg">
-                  <option>9:00 AM</option>
-                  <option>10:00 AM</option>
+                <select
+                  value={appointmentForm.time}
+                  onChange={(e) => handleAppointmentFieldChange('time', e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="" disabled>Select time</option>
+                  {timeOptions.map(slot => (
+                    <option key={slot} value={slot}>{slot}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -662,21 +831,37 @@ const DentalManagementSystem = () => {
             <div className="p-4 bg-blue-50 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-medium">Estimated Cost</p>
-                <p className="text-xl font-bold">$150</p>
+                <p className="text-xl font-bold">${selectedAppointmentCost}</p>
               </div>
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={appointmentForm.payNow}
+                  onChange={(e) => handleAppointmentFieldChange('payNow', e.target.checked)}
+                />
                 Pay now and save 5%
               </label>
             </div>
+
+            {appointmentError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                {appointmentError}
+              </div>
+            )}
           </div>
 
           <div className="p-6 border-t flex gap-3">
-            <button onClick={() => setShowAppointmentModal(false)} className="flex-1 px-4 py-2 border rounded-lg">
+            <button onClick={closeAppointmentModal} className="flex-1 px-4 py-2 border rounded-lg">
               Cancel
             </button>
-            <button className="flex-1 px-4 py-2 bg-teal-500 text-white rounded-lg">
-              Book
+            <button
+              onClick={handleBookAppointment}
+              disabled={isBookingAppointment}
+              className={`flex-1 px-4 py-2 rounded-lg text-white ${
+                isBookingAppointment ? 'bg-teal-300 cursor-not-allowed' : 'bg-teal-500 hover:bg-teal-600'
+              }`}
+            >
+              {isBookingAppointment ? 'Booking...' : 'Book'}
             </button>
           </div>
         </div>

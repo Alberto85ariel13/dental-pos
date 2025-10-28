@@ -1,4 +1,105 @@
 import axios from 'axios';
+import {
+  mockAppointments,
+  mockClaims,
+  mockPatients,
+  mockProviders,
+} from './mockDataStore';
+import { patientPortalMockApi } from './mockPatientPortalApi';
+
+const clone = (value) => JSON.parse(JSON.stringify(value));
+
+const combineDateAndTime = (dateString, timeString) => {
+  if (!dateString) return null;
+  if (!timeString) return `${dateString}T09:00:00`;
+
+  const trimmedTime = timeString.trim();
+  const hasMeridiem = /am|pm/i.test(trimmedTime);
+  let hour = 9;
+  let minute = 0;
+
+  if (hasMeridiem) {
+    const [timePart, meridiemRaw] = trimmedTime.split(/\s+/);
+    const [hourStr, minuteStr] = timePart.split(':');
+    hour = parseInt(hourStr, 10);
+    minute = parseInt(minuteStr ?? '0', 10);
+    const meridiem = meridiemRaw?.toUpperCase();
+
+    if (meridiem === 'PM' && hour < 12) hour += 12;
+    if (meridiem === 'AM' && hour === 12) hour = 0;
+  } else {
+    const [hourStr, minuteStr] = trimmedTime.split(':');
+    hour = parseInt(hourStr, 10);
+    minute = parseInt(minuteStr ?? '0', 10);
+  }
+
+  if (Number.isNaN(hour) || Number.isNaN(minute)) {
+    return `${dateString}T09:00:00`;
+  }
+
+  return `${dateString}T${hour.toString().padStart(2, '0')}:${minute
+    .toString()
+    .padStart(2, '0')}:00`;
+};
+
+const formatTimeForPortal = (isoString) => {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+};
+
+const formatAppointmentForService = (appointment) => {
+  const provider = mockProviders.find((p) => p.id === appointment.providerId);
+  const isoDateTime = appointment.aptDateTime
+    ?? combineDateAndTime(appointment.date, appointment.time);
+  const status = appointment.status ?? 'scheduled';
+  const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+
+  return {
+    aptNum: appointment.aptNum ?? appointment.id,
+    patNum: appointment.patNum ?? null,
+    patientName: appointment.patientName ?? appointment.patient ?? '',
+    aptDateTime: isoDateTime,
+    lengthMinutes: appointment.lengthMinutes ?? provider?.slotDuration ?? 30,
+    procedureCode: appointment.procedureCode ?? null,
+    procedureDescription: appointment.procedureDescription ?? appointment.type ?? '',
+    providerName: appointment.providerName ?? appointment.provider ?? '',
+    operatory: appointment.operatory ?? appointment.room ?? null,
+    status: capitalizedStatus,
+    providerId: appointment.providerId ?? provider?.id ?? null,
+    providerColor: appointment.providerColor ?? provider?.color ?? 'blue',
+    type: appointment.type ?? appointment.procedureDescription ?? '',
+    room: appointment.room ?? appointment.operatory ?? null,
+    estimatedCost: appointment.estimatedCost ?? 0,
+    paymentStatus: appointment.paymentStatus ?? 'pending',
+    day: appointment.day ?? null,
+    date: appointment.date ?? (isoDateTime ? isoDateTime.split('T')[0] : null),
+    time: appointment.time ?? null,
+    note: appointment.note ?? '',
+  };
+};
+
+const formatClaimForService = (claim) => ({
+  claimNum: claim.claimNum ?? claim.id,
+  patNum: claim.patNum ?? null,
+  patientName: claim.patientName ?? '',
+  patientEmail: claim.patientEmail ?? '',
+  patientPhone: claim.patientPhone ?? '',
+  insurance: claim.insurance ?? '',
+  serviceDate: claim.serviceDate ?? '',
+  dueDate: claim.dueDate ?? '',
+  totalBilled: claim.totalBilled ?? claim.amount ?? 0,
+  insurancePaid: claim.insurancePaid ?? 0,
+  patientResponsibility: claim.patientResponsibility ?? claim.patientOwes ?? 0,
+  status: claim.status ?? 'pending',
+  procedures: clone(claim.procedures ?? []),
+  lastReminderSent: claim.lastReminderSent ?? null,
+  patientOwes: claim.patientOwes ?? claim.patientResponsibility ?? 0,
+  reason: claim.reason ?? '',
+  date: claim.date ?? '',
+  amount: claim.amount ?? claim.totalBilled ?? 0,
+});
 
 class OpenDentalService {
   constructor() {
@@ -27,50 +128,9 @@ class OpenDentalService {
     };
   }
 
-  // Mock data for demonstration
+  // Mock data shared with patient portal
   getMockPatients() {
-    return [
-      {
-        patNum: 1001,
-        fName: 'Sarah',
-        lName: 'Johnson',
-        phone: '(555) 123-4567',
-        email: 'sarah.j@email.com',
-        insurance: 'Delta Dental PPO',
-        balance: 0.00,
-        lastVisit: '2025-08-15'
-      },
-      {
-        patNum: 1002,
-        fName: 'Michael',
-        lName: 'Chen',
-        phone: '(555) 234-5678',
-        email: 'mchen@email.com',
-        insurance: 'MetLife Dental',
-        balance: 125.00,
-        lastVisit: '2025-09-30'
-      },
-      {
-        patNum: 1003,
-        fName: 'David',
-        lName: 'Rodriguez',
-        phone: '(555) 345-6789',
-        email: 'drodriguez@email.com',
-        insurance: 'Guardian Dental',
-        balance: 0.00,
-        lastVisit: '2025-10-05'
-      },
-      {
-        patNum: 1004,
-        fName: 'Emily',
-        lName: 'Watson',
-        phone: '(555) 456-7890',
-        email: 'ewatson@email.com',
-        insurance: 'Cigna Dental',
-        balance: 250.00,
-        lastVisit: '2025-09-15'
-      }
-    ];
+    return mockPatients.map((patient) => ({ ...patient }));
   }
 
   async searchPatients(searchTerm) {
@@ -128,56 +188,28 @@ class OpenDentalService {
   }
 
   async getAppointments(date) {
-    return [
-      {
-        aptNum: 2001,
-        patNum: 1002,
-        patientName: 'Michael Chen',
-        aptDateTime: '2025-10-22T09:00:00',
-        lengthMinutes: 60,
-        procedureCode: 'D1110',
-        procedureDescription: 'Routine Checkup & Cleaning',
-        providerName: 'Dr. Martinez',
-        operatory: 'Op 1',
-        status: 'Scheduled'
-      },
-      {
-        aptNum: 2002,
-        patNum: 1001,
-        patientName: 'Sarah Johnson',
-        aptDateTime: '2025-10-22T10:30:00',
-        lengthMinutes: 90,
-        procedureCode: 'D2740',
-        procedureDescription: 'Crown Fitting',
-        providerName: 'Dr. Martinez',
-        operatory: 'Op 2',
-        status: 'Scheduled'
-      },
-      {
-        aptNum: 2003,
-        patNum: 1003,
-        patientName: 'David Rodriguez',
-        aptDateTime: '2025-10-22T14:00:00',
-        lengthMinutes: 120,
-        procedureCode: 'D3310',
-        procedureDescription: 'Root Canal Treatment',
-        providerName: 'Dr. Lee',
-        operatory: 'Op 1',
-        status: 'Scheduled'
-      },
-      {
-        aptNum: 2004,
-        patNum: 1004,
-        patientName: 'Emily Watson',
-        aptDateTime: '2025-10-22T15:30:00',
-        lengthMinutes: 45,
-        procedureCode: 'D9972',
-        procedureDescription: 'Teeth Whitening',
-        providerName: 'Dr. Martinez',
-        operatory: 'Op 3',
-        status: 'Scheduled'
+    try {
+      let normalizedDate = null;
+
+      if (date instanceof Date) {
+        normalizedDate = Number.isNaN(date.getTime()) ? null : date.toISOString().split('T')[0];
+      } else if (typeof date === 'string' && date) {
+        const parsed = new Date(date);
+        normalizedDate = Number.isNaN(parsed.getTime()) ? date : parsed.toISOString().split('T')[0];
       }
-    ];
+
+      const list = normalizedDate
+        ? mockAppointments.filter((appt) => {
+            const apptDate = appt.date ?? appt.aptDateTime?.split('T')[0];
+            return apptDate === normalizedDate;
+          })
+        : mockAppointments;
+
+      return list.map((appointment) => formatAppointmentForService(appointment));
+    } catch (error) {
+      console.error('Error getting appointments:', error);
+      throw error;
+    }
   }
 
   async scheduleAppointment(appointmentData) {
@@ -186,13 +218,36 @@ class OpenDentalService {
       // const response = await axios.post(`${this.baseURL}/api/appointments`, appointmentData, {
       //   headers: this.getHeaders()
       // });
-      
-      // Mock implementation
-      const newAppointment = {
-        aptNum: Math.floor(Math.random() * 10000) + 3000,
-        ...appointmentData,
-        status: 'Scheduled'
-      };
+
+      const isoDateTime = appointmentData.aptDateTime
+        ?? combineDateAndTime(appointmentData.date, appointmentData.time);
+      const provider = mockProviders.find((p) =>
+        p.name === appointmentData.providerName || p.id === appointmentData.providerId,
+      );
+
+      const created = await patientPortalMockApi.addAppointment({
+        patNum: appointmentData.patNum,
+        patient: appointmentData.patientName,
+        providerId: provider?.id ?? appointmentData.providerId ?? null,
+        provider: appointmentData.providerName ?? provider?.name ?? '',
+        providerColor: provider?.color,
+        procedureCode: appointmentData.procedureCode,
+        procedureDescription: appointmentData.procedureDescription,
+        type: appointmentData.procedureDescription ?? appointmentData.type ?? 'General Appointment',
+        reason: appointmentData.note ?? appointmentData.procedureDescription ?? appointmentData.type,
+        aptDateTime: isoDateTime,
+        date: isoDateTime ? isoDateTime.split('T')[0] : appointmentData.date,
+        time: formatTimeForPortal(isoDateTime),
+        status: 'scheduled',
+        operatory: appointmentData.operatory,
+        room: appointmentData.operatory,
+        lengthMinutes: appointmentData.lengthMinutes,
+        estimatedCost: appointmentData.estimatedCost ?? 0,
+        paymentStatus: 'pending',
+        note: appointmentData.note ?? '',
+      });
+
+      const newAppointment = formatAppointmentForService(created);
 
       // Sync back to OpenDental
       await this.syncAppointmentToOpenDental(newAppointment);
@@ -237,88 +292,11 @@ class OpenDentalService {
   // Get open claims
   async getOpenClaims(filterStatus = 'all') {
     try {
-      const mockClaims = [
-        {
-          claimNum: 5001,
-          patNum: 1001,
-          patientName: 'Sarah Johnson',
-          patientEmail: 'sarah.j@email.com',
-          patientPhone: '(555) 123-4567',
-          insurance: 'Delta Dental PPO',
-          serviceDate: '2025-09-15',
-          dueDate: '2025-10-15',
-          totalBilled: 850.00,
-          insurancePaid: 595.00,
-          patientResponsibility: 255.00,
-          status: 'pending',
-          procedures: [
-            { code: 'D2740', description: 'Crown - Porcelain/Ceramic', fee: 850.00 }
-          ],
-          lastReminderSent: null
-        },
-        {
-          claimNum: 5002,
-          patNum: 1002,
-          patientName: 'Michael Chen',
-          patientEmail: 'mchen@email.com',
-          patientPhone: '(555) 234-5678',
-          insurance: 'MetLife Dental',
-          serviceDate: '2025-08-20',
-          dueDate: '2025-09-20',
-          totalBilled: 1200.00,
-          insurancePaid: 960.00,
-          patientResponsibility: 240.00,
-          status: 'overdue',
-          procedures: [
-            { code: 'D3310', description: 'Root Canal - Anterior', fee: 900.00 },
-            { code: 'D2740', description: 'Crown Build-up', fee: 300.00 }
-          ],
-          lastReminderSent: '2025-10-01'
-        },
-        {
-          claimNum: 5003,
-          patNum: 1004,
-          patientName: 'Emily Watson',
-          patientEmail: 'ewatson@email.com',
-          patientPhone: '(555) 456-7890',
-          insurance: 'Cigna Dental',
-          serviceDate: '2025-10-01',
-          dueDate: '2025-11-01',
-          totalBilled: 450.00,
-          insurancePaid: 360.00,
-          patientResponsibility: 90.00,
-          status: 'sent',
-          procedures: [
-            { code: 'D9972', description: 'External Bleaching', fee: 450.00 }
-          ],
-          lastReminderSent: '2025-10-15'
-        },
-        {
-          claimNum: 5004,
-          patNum: 1003,
-          patientName: 'David Rodriguez',
-          patientEmail: 'drodriguez@email.com',
-          patientPhone: '(555) 345-6789',
-          insurance: 'Guardian Dental',
-          serviceDate: '2025-07-10',
-          dueDate: '2025-08-10',
-          totalBilled: 650.00,
-          insurancePaid: 520.00,
-          patientResponsibility: 130.00,
-          status: 'overdue',
-          procedures: [
-            { code: 'D2150', description: 'Amalgam - Two Surfaces', fee: 220.00 },
-            { code: 'D1110', description: 'Prophylaxis - Adult', fee: 120.00 },
-            { code: 'D0210', description: 'Complete Intraoral Radiographs', fee: 200.00 }
-          ],
-          lastReminderSent: '2025-09-10'
-        }
-      ];
+      const list = filterStatus !== 'all'
+        ? mockClaims.filter((claim) => claim.status === filterStatus)
+        : mockClaims;
 
-      if (filterStatus !== 'all') {
-        return mockClaims.filter(c => c.status === filterStatus);
-      }
-      return mockClaims;
+      return list.map((claim) => formatClaimForService(claim));
     } catch (error) {
       console.error('Error getting open claims:', error);
       throw error;
@@ -329,7 +307,11 @@ class OpenDentalService {
   async sendPaymentLink(claim) {
     try {
       console.log('Sending payment link:', claim);
-      await this.updateClaimStatus(claim.claimNum, 'sent');
+      const today = new Date().toISOString().split('T')[0];
+      await patientPortalMockApi.updateClaim(claim.claimNum, {
+        status: 'sent',
+        lastReminderSent: today,
+      });
       return {
         success: true,
         paymentLink: `https://payments.dentalpro.com/pay/${claim.claimNum}`,
@@ -357,6 +339,11 @@ class OpenDentalService {
   async markClaimPaid(claimNum) {
     try {
       console.log('Marking claim as paid:', claimNum);
+      await patientPortalMockApi.updateClaim(claimNum, {
+        status: 'paid',
+        patientResponsibility: 0,
+        patientOwes: 0,
+      });
       await this.syncPaymentToOpenDental(claimNum);
       return { success: true };
     } catch (error) {
@@ -369,6 +356,7 @@ class OpenDentalService {
   async updateClaimStatus(claimNum, status) {
     try {
       console.log('Updating claim status:', claimNum, status);
+      await patientPortalMockApi.updateClaim(claimNum, { status });
       return { success: true };
     } catch (error) {
       console.error('Error updating claim status:', error);
@@ -380,6 +368,8 @@ class OpenDentalService {
   async updateClaimReminderDate(claimNum) {
     try {
       console.log('Updating reminder date:', claimNum);
+      const today = new Date().toISOString().split('T')[0];
+      await patientPortalMockApi.updateClaim(claimNum, { lastReminderSent: today });
       return { success: true };
     } catch (error) {
       console.error('Error updating reminder date:', error);
@@ -461,10 +451,16 @@ class OpenDentalService {
       // });
 
       console.log('Updating patient status:', aptNum, status, room);
-      
+
+      await patientPortalMockApi.updateAppointment(aptNum, {
+        status,
+        room,
+        operatory: room ?? undefined,
+      });
+
       // Sync to OpenDental
       await this.syncStatusToOpenDental(aptNum, status, room);
-      
+
       return { success: true };
     } catch (error) {
       console.error('Error updating patient status:', error);
@@ -496,16 +492,21 @@ class OpenDentalService {
   async updateAppointment(appointmentData) {
     try {
       // Real API call:
-      // await axios.put(`${this.baseURL}/api/appointments/${appointmentData.aptNum}`, 
+      // await axios.put(`${this.baseURL}/api/appointments/${appointmentData.aptNum}`,
       //   appointmentData, {
       //   headers: this.getHeaders()
       // });
 
       console.log('Updating appointment:', appointmentData);
-      
+
+      await patientPortalMockApi.updateAppointment(
+        appointmentData.aptNum ?? appointmentData.id,
+        appointmentData,
+      );
+
       // Sync changes to OpenDental
       await this.syncAppointmentToOpenDental(appointmentData);
-      
+
       // Send update notification if time changed
       if (appointmentData.timeChanged) {
         await this.sendAppointmentUpdateNotification(appointmentData);
