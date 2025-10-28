@@ -274,6 +274,27 @@ class OpenDentalService {
         p.name === appointmentData.providerName || p.id === appointmentData.providerId,
       );
 
+      let estimatedCost = Number(appointmentData.estimatedCost);
+      if (!Number.isFinite(estimatedCost)) {
+        const fallbackCost = Number(appointmentData.fee ?? appointmentData.cost);
+        if (Number.isFinite(fallbackCost)) {
+          estimatedCost = fallbackCost;
+        } else if (appointmentData.procedureCode) {
+          const procedures = await this.getProcedureCodes();
+          const matchedProcedure = procedures.find(
+            (code) => code.code === appointmentData.procedureCode,
+          );
+          const matchedFee = Number(matchedProcedure?.fee);
+          if (Number.isFinite(matchedFee)) {
+            estimatedCost = matchedFee;
+          }
+        }
+      }
+
+      if (!Number.isFinite(estimatedCost)) {
+        estimatedCost = 0;
+      }
+
       const created = await patientPortalMockApi.addAppointment({
         patNum: appointmentData.patNum,
         patient: appointmentData.patientName,
@@ -291,7 +312,7 @@ class OpenDentalService {
         operatory: appointmentData.operatory,
         room: appointmentData.operatory,
         lengthMinutes: appointmentData.lengthMinutes,
-        estimatedCost: appointmentData.estimatedCost ?? 0,
+        estimatedCost,
         paymentStatus: 'pending',
         note: appointmentData.note ?? '',
       });

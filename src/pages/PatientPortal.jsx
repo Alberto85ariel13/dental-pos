@@ -77,6 +77,14 @@ const DentalManagementSystem = () => {
     { id: 2, last4: '5555', brand: 'Mastercard', expiry: '03/27', isDefault: false, status: 'failed' }
   ]);
 
+  const formatCurrency = useCallback((value) => {
+    const amount = Number(value ?? 0);
+    if (!Number.isFinite(amount)) {
+      return '$0.00';
+    }
+    return `$${amount.toFixed(2)}`;
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -270,6 +278,39 @@ const DentalManagementSystem = () => {
     [appointments]
   );
 
+  const outstandingAppointments = useMemo(
+    () => appointments.filter((appointment) => {
+      const paymentStatus = String(appointment.paymentStatus ?? '').toLowerCase();
+      const cost = Number(appointment.estimatedCost ?? 0);
+      return paymentStatus !== 'paid' && Number.isFinite(cost) && cost > 0;
+    }),
+    [appointments],
+  );
+
+  const outstandingClaims = useMemo(
+    () => claims.filter((claim) => {
+      const amount = Number(claim.patientOwes ?? claim.patientResponsibility ?? claim.amount ?? 0);
+      return Number.isFinite(amount) && amount > 0;
+    }),
+    [claims],
+  );
+
+  const outstandingAppointmentTotal = useMemo(
+    () => outstandingAppointments.reduce((total, appointment) => {
+      const cost = Number(appointment.estimatedCost ?? 0);
+      return total + (Number.isFinite(cost) ? cost : 0);
+    }, 0),
+    [outstandingAppointments],
+  );
+
+  const outstandingClaimTotal = useMemo(
+    () => outstandingClaims.reduce((total, claim) => {
+      const amount = Number(claim.patientOwes ?? claim.patientResponsibility ?? claim.amount ?? 0);
+      return total + (Number.isFinite(amount) ? amount : 0);
+    }, 0),
+    [outstandingClaims],
+  );
+
   if (isLoading) {
     return <div className="p-6 text-slate-500">Loading patient portal...</div>;
   }
@@ -305,7 +346,7 @@ const DentalManagementSystem = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-slate-600 text-sm mb-1">Outstanding Balance</p>
-              <p className="text-2xl font-bold text-red-600">${patientData.balance.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-red-600">{formatCurrency(patientData.balance ?? 0)}</p>
               {patientData.autopayFailing && (
                 <div className="flex items-center gap-1 mt-1">
                   <AlertTriangle className="w-4 h-4 text-red-600" />
@@ -685,7 +726,20 @@ const DentalManagementSystem = () => {
           <div className="p-6 space-y-6">
             <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-4">
               <p className="text-sm text-slate-600 mb-1">Total Outstanding</p>
-              <p className="text-3xl font-bold text-red-600">${patientData.balance.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-red-600">{formatCurrency(patientData.balance ?? 0)}</p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">Unpaid Appointments</p>
+                <p className="text-xl font-bold text-slate-800">{formatCurrency(outstandingAppointmentTotal)}</p>
+                <p className="text-xs text-slate-500">{outstandingAppointments.length} upcoming charge{outstandingAppointments.length === 1 ? '' : 's'}</p>
+              </div>
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">Outstanding Claims</p>
+                <p className="text-xl font-bold text-slate-800">{formatCurrency(outstandingClaimTotal)}</p>
+                <p className="text-xs text-slate-500">{outstandingClaims.length} claim{outstandingClaims.length === 1 ? '' : 's'} awaiting payment</p>
+              </div>
             </div>
 
             {patientData.autopayEnrolled && (
@@ -710,54 +764,96 @@ const DentalManagementSystem = () => {
                 )}
               </div>
             )}
+            <div>
+              <h4 className="text-lg font-bold text-slate-800 mb-4">Unpaid Appointments</h4>
+              {outstandingAppointments.length === 0 ? (
+                <p className="text-sm text-slate-500">All upcoming appointments have been paid.</p>
+              ) : (
+                <div className="space-y-4">
+                  {outstandingAppointments.map((appointment) => (
+                    <div key={appointment.aptNum ?? appointment.id} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h5 className="font-bold text-slate-800">{appointment.type}</h5>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              appointment.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
+                              appointment.status === 'scheduled' ? 'bg-slate-100 text-slate-700' :
+                              'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {appointment.status}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-600 mb-2">
+                            {appointment.date} • {appointment.time} • {appointment.provider}
+                          </p>
+                          {appointment.reason && (
+                            <p className="text-xs text-slate-500">Reason: {appointment.reason}</p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-slate-600">Estimated</p>
+                          <p className="text-2xl font-bold text-slate-800">{formatCurrency(appointment.estimatedCost)}</p>
+                          <p className="text-xs text-slate-500 capitalize">{appointment.paymentStatus ?? 'pending'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div>
-              <h4 className="text-lg font-bold text-slate-800 mb-4">Claims & Charges</h4>
-              <div className="space-y-4">
-                {claims.map(claim => (
-                  <div key={claim.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h5 className="font-bold text-slate-800">{claim.procedure}</h5>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            claim.status === 'partially_covered' ? 'bg-yellow-100 text-yellow-700' :
-                            claim.status === 'pending' ? 'bg-blue-100 text-blue-700' :
-                            'bg-green-100 text-green-700'
-                          }`}>
-                            {claim.status === 'partially_covered' ? 'Partially Covered' :
-                             claim.status === 'pending' ? 'Pending' : 'Approved'}
-                          </span>
+              <h4 className="text-lg font-bold text-slate-800 mb-4">Outstanding Claims</h4>
+              {outstandingClaims.length === 0 ? (
+                <p className="text-sm text-slate-500">No open claims with patient responsibility.</p>
+              ) : (
+                <div className="space-y-4">
+                  {outstandingClaims.map((claim) => (
+                    <div key={claim.id ?? claim.claimNum} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h5 className="font-bold text-slate-800">{claim.procedure}</h5>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              claim.status === 'partially_covered' ? 'bg-yellow-100 text-yellow-700' :
+                              claim.status === 'pending' ? 'bg-blue-100 text-blue-700' :
+                              'bg-green-100 text-green-700'
+                            }`}>
+                              {claim.status === 'partially_covered' ? 'Partially Covered' :
+                               claim.status === 'pending' ? 'Pending' : 'Approved'}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-600 mb-2">{claim.date}</p>
                         </div>
-                        <p className="text-sm text-slate-600 mb-2">{claim.date}</p>
+                        <div className="text-right">
+                          <p className="text-sm text-slate-600">You Owe</p>
+                          <p className="text-2xl font-bold text-red-600">{formatCurrency(claim.patientOwes ?? claim.patientResponsibility ?? 0)}</p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-slate-600">You Owe</p>
-                        <p className="text-2xl font-bold text-red-600">${claim.patientOwes}</p>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-3 gap-4 p-3 bg-slate-50 rounded-lg mb-3">
-                      <div>
-                        <p className="text-xs text-slate-600">Total Charge</p>
-                        <p className="font-bold text-slate-800">${claim.amount}</p>
+                      <div className="grid grid-cols-3 gap-4 p-3 bg-slate-50 rounded-lg mb-3">
+                        <div>
+                          <p className="text-xs text-slate-600">Total Charge</p>
+                          <p className="font-bold text-slate-800">{formatCurrency(claim.amount ?? claim.totalBilled ?? 0)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-600">Insurance Paid</p>
+                          <p className="font-bold text-green-600">{formatCurrency(claim.insurancePaid ?? 0)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-600">Your Responsibility</p>
+                          <p className="font-bold text-red-600">{formatCurrency(claim.patientOwes ?? claim.patientResponsibility ?? 0)}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-slate-600">Insurance Paid</p>
-                        <p className="font-bold text-green-600">${claim.insurancePaid}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-600">Your Responsibility</p>
-                        <p className="font-bold text-red-600">${claim.patientOwes}</p>
-                      </div>
-                    </div>
 
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
-                      <p className="text-sm text-blue-800"><strong>Explanation:</strong> {claim.reason}</p>
+                      <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
+                        <p className="text-sm text-blue-800"><strong>Explanation:</strong> {claim.reason}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -768,14 +864,14 @@ const DentalManagementSystem = () => {
             >
               Close
             </button>
-            <button 
+            <button
               onClick={() => {
                 setShowClaimDetailsModal(false);
                 setShowPaymentModal(true);
               }}
               className="flex-1 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
             >
-              Pay ${patientData.balance.toFixed(2)}
+              Pay {formatCurrency(patientData.balance ?? 0)}
             </button>
           </div>
         </div>
@@ -914,7 +1010,7 @@ const DentalManagementSystem = () => {
           <div className="p-6 space-y-4">
             <div className="p-4 bg-slate-50 rounded-lg">
               <p className="text-sm text-slate-600 mb-1">Amount Due</p>
-              <p className="text-3xl font-bold text-slate-800">${patientData.balance.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-slate-800">{formatCurrency(patientData.balance ?? 0)}</p>
             </div>
 
             {savedCards.map(card => (

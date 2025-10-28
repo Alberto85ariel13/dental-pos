@@ -60,6 +60,7 @@ function Schedule() {
         lengthMinutes: duration,
         procedureCode: selectedProcedure.code,
         procedureDescription: selectedProcedure.description,
+        estimatedCost: selectedProcedure.fee,
         providerName: 'Dr. Martinez',
         operatory: 'Op 1',
         note: note,
