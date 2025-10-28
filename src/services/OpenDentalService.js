@@ -9,6 +9,46 @@ import { patientPortalMockApi } from './mockPatientPortalApi';
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
+const parsePatNum = (value) => {
+  if (value === undefined || value === null) return null;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const normalizeName = (name) => (name ? name.trim().toLowerCase() : '');
+
+const resolvePatientRecordByName = (patientName) => {
+  const normalized = normalizeName(patientName);
+  if (!normalized) return null;
+  return mockPatients.find(
+    (patient) => normalizeName(`${patient.fName} ${patient.lName}`) === normalized,
+  ) ?? null;
+};
+
+const resolvePatientMeta = (patientName, patNum) => {
+  const parsedPatNum = parsePatNum(patNum);
+  const byId = parsedPatNum ? mockPatients.find((patient) => patient.patNum === parsedPatNum) : null;
+  const record = byId ?? resolvePatientRecordByName(patientName);
+
+  if (!record) {
+    return {
+      patNum: parsedPatNum ?? null,
+      patientName: patientName ?? '',
+      patientPhone: null,
+      patientEmail: null,
+      insurance: null,
+    };
+  }
+
+  return {
+    patNum: record.patNum,
+    patientName: `${record.fName} ${record.lName}`,
+    patientPhone: record.phone,
+    patientEmail: record.email,
+    insurance: record.insurance,
+  };
+};
+
 const combineDateAndTime = (dateString, timeString) => {
   if (!dateString) return null;
   if (!timeString) return `${dateString}T09:00:00`;
@@ -51,6 +91,7 @@ const formatTimeForPortal = (isoString) => {
 
 const formatAppointmentForService = (appointment) => {
   const provider = mockProviders.find((p) => p.id === appointment.providerId);
+  const patientMeta = resolvePatientMeta(appointment.patientName ?? appointment.patient, appointment.patNum);
   const isoDateTime = appointment.aptDateTime
     ?? combineDateAndTime(appointment.date, appointment.time);
   const status = appointment.status ?? 'scheduled';
@@ -58,8 +99,9 @@ const formatAppointmentForService = (appointment) => {
 
   return {
     aptNum: appointment.aptNum ?? appointment.id,
-    patNum: appointment.patNum ?? null,
-    patientName: appointment.patientName ?? appointment.patient ?? '',
+    patNum: patientMeta.patNum,
+    patientName: patientMeta.patientName || appointment.patientName || appointment.patient || '',
+    patientPhone: appointment.patientPhone ?? patientMeta.patientPhone ?? '(555) 000-0000',
     aptDateTime: isoDateTime,
     lengthMinutes: appointment.lengthMinutes ?? provider?.slotDuration ?? 30,
     procedureCode: appointment.procedureCode ?? null,
@@ -80,26 +122,30 @@ const formatAppointmentForService = (appointment) => {
   };
 };
 
-const formatClaimForService = (claim) => ({
-  claimNum: claim.claimNum ?? claim.id,
-  patNum: claim.patNum ?? null,
-  patientName: claim.patientName ?? '',
-  patientEmail: claim.patientEmail ?? '',
-  patientPhone: claim.patientPhone ?? '',
-  insurance: claim.insurance ?? '',
-  serviceDate: claim.serviceDate ?? '',
-  dueDate: claim.dueDate ?? '',
-  totalBilled: claim.totalBilled ?? claim.amount ?? 0,
-  insurancePaid: claim.insurancePaid ?? 0,
-  patientResponsibility: claim.patientResponsibility ?? claim.patientOwes ?? 0,
-  status: claim.status ?? 'pending',
-  procedures: clone(claim.procedures ?? []),
-  lastReminderSent: claim.lastReminderSent ?? null,
-  patientOwes: claim.patientOwes ?? claim.patientResponsibility ?? 0,
-  reason: claim.reason ?? '',
-  date: claim.date ?? '',
-  amount: claim.amount ?? claim.totalBilled ?? 0,
-});
+const formatClaimForService = (claim) => {
+  const patientMeta = resolvePatientMeta(claim.patientName, claim.patNum);
+
+  return {
+    claimNum: claim.claimNum ?? claim.id,
+    patNum: patientMeta.patNum,
+    patientName: patientMeta.patientName || claim.patientName || '',
+    patientEmail: claim.patientEmail ?? patientMeta.patientEmail ?? '',
+    patientPhone: claim.patientPhone ?? patientMeta.patientPhone ?? '',
+    insurance: claim.insurance ?? patientMeta.insurance ?? '',
+    serviceDate: claim.serviceDate ?? '',
+    dueDate: claim.dueDate ?? '',
+    totalBilled: claim.totalBilled ?? claim.amount ?? 0,
+    insurancePaid: claim.insurancePaid ?? 0,
+    patientResponsibility: claim.patientResponsibility ?? claim.patientOwes ?? 0,
+    status: claim.status ?? 'pending',
+    procedures: clone(claim.procedures ?? []),
+    lastReminderSent: claim.lastReminderSent ?? null,
+    patientOwes: claim.patientOwes ?? claim.patientResponsibility ?? 0,
+    reason: claim.reason ?? '',
+    date: claim.date ?? '',
+    amount: claim.amount ?? claim.totalBilled ?? 0,
+  };
+};
 
 class OpenDentalService {
   constructor() {
@@ -130,7 +176,10 @@ class OpenDentalService {
 
   // Mock data shared with patient portal
   getMockPatients() {
-    return mockPatients.map((patient) => ({ ...patient }));
+    return mockPatients.map((patient) => ({
+      ...patient,
+      patientName: `${patient.fName} ${patient.lName}`,
+    }));
   }
 
   async searchPatients(searchTerm) {
@@ -909,12 +958,118 @@ class OpenDentalService {
   }
 
   // Get call history
-  async getCallHistory(claimNum) {
-    // Mock data
-    return [
-      { date: '2025-10-20', disposition: 'no_answer' },
-      { date: '2025-10-18', disposition: 'voicemail' }
-    ];
+  async getCallHistory(filterPeriod = 'all', filterDisposition = 'all') {
+    try {
+      const baseHistory = [
+        {
+          callSid: 'HIST1001',
+          patNum: 1001,
+          patientName: 'Sarah Johnson',
+          phoneNumber: '(555) 123-4567',
+          direction: 'outbound',
+          disposition: 'no_answer',
+          timestamp: '2025-10-24T09:15:00Z',
+          duration: 0,
+          note: 'Left voicemail with payment reminder',
+          aiAnalysis: {
+            sentiment: 'Neutral',
+            paymentIntent: 'Medium',
+            recommendation: 'Send SMS follow-up',
+          },
+        },
+        {
+          callSid: 'HIST1002',
+          patNum: 1002,
+          patientName: 'Michael Chen',
+          phoneNumber: '(555) 234-5678',
+          direction: 'outbound',
+          disposition: 'answered',
+          timestamp: '2025-10-23T15:45:00Z',
+          duration: 240,
+          recordingUrl: '/audio/call-michael.mp3',
+          aiAnalysis: {
+            sentiment: 'Positive',
+            paymentIntent: 'High',
+            recommendation: 'No further action needed',
+          },
+        },
+        {
+          callSid: 'HIST1003',
+          patNum: 1004,
+          patientName: 'Emily Watson',
+          phoneNumber: '(555) 456-7890',
+          direction: 'outbound',
+          disposition: 'voicemail',
+          timestamp: '2025-10-22T13:05:00Z',
+          duration: 35,
+          note: 'Voicemail left with follow-up instructions',
+          aiAnalysis: {
+            sentiment: 'Neutral',
+            paymentIntent: 'Medium',
+            recommendation: 'Schedule follow-up call tomorrow',
+          },
+        },
+      ];
+
+      const historyWithMeta = baseHistory.map((call) => {
+        const meta = resolvePatientMeta(call.patientName, call.patNum);
+        return {
+          ...call,
+          patNum: meta.patNum,
+          patientName: meta.patientName || call.patientName,
+          phoneNumber: call.phoneNumber ?? meta.patientPhone ?? '',
+          patientPhone: meta.patientPhone ?? call.phoneNumber ?? '',
+        };
+      });
+
+      const periodOptions = new Set(['all', 'today', 'week', 'month']);
+      const normalizedPeriod = typeof filterPeriod === 'string'
+        ? filterPeriod.toLowerCase()
+        : filterPeriod;
+      const parsedClaimNum = parsePatNum(filterPeriod);
+
+      if (!periodOptions.has(normalizedPeriod) && parsedClaimNum !== null) {
+        const claim = await this.getClaimDetails(parsedClaimNum);
+        if (claim?.patNum) {
+          let claimHistory = historyWithMeta.filter((call) => call.patNum === claim.patNum);
+          if (filterDisposition !== 'all') {
+            claimHistory = claimHistory.filter((call) => call.disposition === filterDisposition);
+          }
+          return claimHistory;
+        }
+        if (filterDisposition !== 'all') {
+          return historyWithMeta.filter((call) => call.disposition === filterDisposition);
+        }
+        return historyWithMeta;
+      }
+
+      const now = new Date();
+      const filterByPeriod = (call) => {
+        const period = periodOptions.has(normalizedPeriod) ? normalizedPeriod : 'all';
+        if (period === 'all') return true;
+        const callDate = new Date(call.timestamp);
+        if (Number.isNaN(callDate.getTime())) return true;
+
+        if (period === 'today') {
+          return callDate.toDateString() === now.toDateString();
+        }
+
+        const diffDays = (now - callDate) / (1000 * 60 * 60 * 24);
+        if (period === 'week') return diffDays <= 7;
+        if (period === 'month') return diffDays <= 30;
+        return true;
+      };
+
+      let filtered = historyWithMeta.filter(filterByPeriod);
+      if (filterDisposition !== 'all') {
+        filtered = filtered.filter((call) => call.disposition === filterDisposition);
+      }
+
+      return filtered;
+    } catch (error) {
+      console.error('Error getting call history:', error);
+      throw error;
+    }
   }
 
   // Get claim details
@@ -1061,10 +1216,11 @@ class OpenDentalService {
   async getAllCalls(filterType = 'all') {
     try {
       // Real API call would filter on backend
-      const mockCalls = [
+      const baseCalls = [
         {
           callSid: 'CA1234567890',
-          patientName: 'John Smith',
+          patNum: 1001,
+          patientName: 'Sarah Johnson',
           toNumber: '+15551234567',
           purpose: 'payment_reminder',
           status: 'completed',
@@ -1077,8 +1233,9 @@ class OpenDentalService {
         },
         {
           callSid: 'CA9876543210',
-          patientName: 'Sarah Johnson',
-          toNumber: '+15559876543',
+          patNum: 1002,
+          patientName: 'Michael Chen',
+          toNumber: '+15552345678',
           purpose: 'payment_reminder',
           status: 'no-answer',
           disposition: 'no-answer',
@@ -1090,8 +1247,9 @@ class OpenDentalService {
         },
         {
           callSid: 'CA5555555555',
-          patientName: 'Mike Williams',
-          toNumber: '+15555555555',
+          patNum: 1004,
+          patientName: 'Emily Watson',
+          toNumber: '+15554567890',
           purpose: 'appointment_reminder',
           status: 'completed',
           disposition: 'voicemail',
@@ -1103,12 +1261,23 @@ class OpenDentalService {
         }
       ];
 
+      const mockCalls = baseCalls.map((call) => {
+        const meta = resolvePatientMeta(call.patientName, call.patNum);
+        return {
+          ...call,
+          patNum: meta.patNum,
+          patientName: meta.patientName || call.patientName,
+          patientPhone: call.patientPhone ?? meta.patientPhone ?? null,
+          toNumber: call.toNumber ?? (meta.patientPhone ? meta.patientPhone.replace(/[^\d+]/g, '') : null),
+        };
+      });
+
       if (filterType === 'all') return mockCalls;
       if (filterType === 'payment') return mockCalls.filter(c => c.purpose.includes('payment'));
       if (filterType === 'appointment') return mockCalls.filter(c => c.purpose.includes('appointment'));
       if (filterType === 'voicemail') return mockCalls.filter(c => c.disposition === 'voicemail');
       if (filterType === 'no-answer') return mockCalls.filter(c => c.disposition === 'no-answer');
-      
+
       return mockCalls;
     } catch (error) {
       console.error('Error getting calls:', error);
@@ -1212,11 +1381,12 @@ class OpenDentalService {
 
   async getConversations(filterType = 'all') {
     try {
-      const mockConversations = [
+      const baseConversations = [
         {
           conversationId: 'conv_001',
-          patientName: 'Emma Davis',
-          phoneNumber: '+15551111111',
+          patNum: 1001,
+          patientName: 'Sarah Johnson',
+          phoneNumber: '(555) 123-4567',
           type: 'sms',
           lastMessage: 'Thanks! I\'ll make the payment today.',
           lastMessageTime: '2025-10-24T11:30:00Z',
@@ -1225,8 +1395,9 @@ class OpenDentalService {
         },
         {
           conversationId: 'conv_002',
-          patientName: 'Michael Brown',
-          phoneNumber: '+15552222222',
+          patNum: 1002,
+          patientName: 'Michael Chen',
+          phoneNumber: '(555) 234-5678',
           type: 'whatsapp',
           lastMessage: 'Can I schedule for next week?',
           lastMessageTime: '2025-10-24T10:15:00Z',
@@ -1235,8 +1406,9 @@ class OpenDentalService {
         },
         {
           conversationId: 'conv_003',
-          patientName: 'Lisa Anderson',
-          phoneNumber: '+15553333333',
+          patNum: 1004,
+          patientName: 'Emily Watson',
+          phoneNumber: '(555) 456-7890',
           type: 'sms',
           lastMessage: 'Received the payment link, thanks!',
           lastMessageTime: '2025-10-23T16:45:00Z',
@@ -1244,6 +1416,16 @@ class OpenDentalService {
           unreadCount: 0
         }
       ];
+
+      const mockConversations = baseConversations.map((conversation) => {
+        const meta = resolvePatientMeta(conversation.patientName, conversation.patNum);
+        return {
+          ...conversation,
+          patNum: meta.patNum,
+          patientName: meta.patientName || conversation.patientName,
+          phoneNumber: conversation.phoneNumber ?? meta.patientPhone ?? '',
+        };
+      });
 
       if (filterType === 'all') return mockConversations;
       if (filterType === 'sms') return mockConversations.filter(c => c.type === 'sms');
@@ -1333,7 +1515,7 @@ class OpenDentalService {
         success: true,
         conversation: {
           conversationId: 'conv_' + Date.now(),
-          patientName: conversationData.patientName,
+          ...resolvePatientMeta(conversationData.patientName, conversationData.patNum),
           phoneNumber: conversationData.toNumber,
           type: conversationData.type,
           lastMessage: conversationData.message,

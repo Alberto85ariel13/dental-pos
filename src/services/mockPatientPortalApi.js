@@ -9,6 +9,18 @@ import {
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
+const parsePatNum = (value) => {
+  if (value === undefined || value === null) return null;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const findPatientByPatNum = (patNum) => {
+  const parsed = parsePatNum(patNum);
+  if (parsed === null) return null;
+  return mockPatients.find((p) => p.patNum === parsed) ?? null;
+};
+
 const determineDayLabel = (dateString) => {
   if (!dateString) return 'upcoming';
   const selectedDate = new Date(dateString);
@@ -90,9 +102,8 @@ const resolveProvider = (appointment) => {
 
 const resolvePatient = (appointment) => {
   if (!appointment) return {};
-  const patientFromId = appointment.patNum
-    ? mockPatients.find((p) => p.patNum === appointment.patNum)
-    : null;
+  const patNum = parsePatNum(appointment.patNum);
+  const patientFromId = patNum ? mockPatients.find((p) => p.patNum === patNum) : null;
 
   const patientNameFromInput = appointment.patient
     || appointment.patientName
@@ -229,21 +240,58 @@ const computeNextAppointment = (apptList = mockAppointments) => {
 const computeBalance = (claimList = mockClaims) =>
   claimList.reduce((total, claim) => total + Number(claim.patientOwes ?? claim.patientResponsibility ?? 0), 0);
 
+const buildPatientProfile = (patientRecord, patientAppointments, patientClaims) => {
+  const baseProfile = clone(mockPatientProfile);
+  const resolvedName = patientRecord ? `${patientRecord.fName} ${patientRecord.lName}` : baseProfile.name;
+
+  return {
+    ...baseProfile,
+    patNum: patientRecord?.patNum ?? baseProfile.patNum ?? null,
+    name: resolvedName,
+    email: patientRecord?.email ?? baseProfile.email ?? '',
+    phone: patientRecord?.phone ?? baseProfile.phone ?? '',
+    insurance: patientRecord?.insurance ?? baseProfile.insurance ?? '',
+    lastVisit: patientRecord?.lastVisit ?? baseProfile.lastVisit ?? null,
+    messages: clone(baseProfile.messages ?? []),
+    upcomingRecommendations: clone(baseProfile.upcomingRecommendations ?? []),
+    balance: computeBalance(patientClaims),
+    nextAppointment: computeNextAppointment(patientAppointments),
+    claims: clone(patientClaims),
+  };
+};
+
 export const patientPortalMockApi = {
-  async getPatientPortalSnapshot() {
+  async getPatientPortalSnapshot(patNumInput = null) {
+    const defaultPatNum = parsePatNum(mockPatientProfile.patNum) ?? mockPatients[0]?.patNum ?? null;
+    const requestedPatNum = parsePatNum(patNumInput ?? defaultPatNum);
+
+    if (patNumInput !== null && requestedPatNum === null) {
+      throw new Error(`Invalid patient ID ${patNumInput}`);
+    }
+
+    const patientRecord = requestedPatNum ? findPatientByPatNum(requestedPatNum) : null;
+
+    if (patNumInput !== null && requestedPatNum !== null && !patientRecord) {
+      throw new Error(`Patient with ID ${patNumInput} not found`);
+    }
+
+    const activePatNum = patientRecord?.patNum ?? defaultPatNum;
+    const patientAppointments = activePatNum
+      ? mockAppointments.filter((appt) => parsePatNum(appt.patNum) === activePatNum)
+      : mockAppointments;
+    const patientClaims = activePatNum
+      ? mockClaims.filter((claim) => parsePatNum(claim.patNum) === activePatNum)
+      : mockClaims;
+
+    const patient = buildPatientProfile(patientRecord, patientAppointments, patientClaims);
+    const officeSnapshot = clone(mockOfficeState);
+    officeSnapshot.stats = computeStats(undefined, officeSnapshot.openRequests);
+
     return {
-      patient: {
-        ...clone(mockPatientProfile),
-        balance: computeBalance(mockClaims),
-        nextAppointment: computeNextAppointment(mockAppointments),
-        claims: clone(mockClaims),
-      },
-      appointments: clone(mockAppointments),
-      claims: clone(mockClaims),
-      office: {
-        ...clone(mockOfficeState),
-        stats: computeStats(mockAppointments, mockOfficeState.openRequests),
-      },
+      patient,
+      appointments: clone(patientAppointments),
+      claims: clone(patientClaims),
+      office: officeSnapshot,
       providers: clone(mockProviders),
     };
   },
@@ -253,7 +301,9 @@ export const patientPortalMockApi = {
   },
 
   async getPatient(patNum) {
-    const patient = mockPatients.find((p) => p.patNum === patNum);
+    const parsed = parsePatNum(patNum);
+    if (parsed === null) return null;
+    const patient = mockPatients.find((p) => p.patNum === parsed);
     return patient ? clone(patient) : null;
   },
 
@@ -339,6 +389,10 @@ export const patientPortalMockApi = {
 
     mockClaims.push(newClaim);
     return clone(newClaim);
+  },
+
+  getDefaultPatientId() {
+    return parsePatNum(mockPatientProfile.patNum) ?? mockPatients[0]?.patNum ?? null;
   },
 
   computeStats,

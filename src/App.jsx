@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import Checkout from './pages/Checkout';
 import PatientSearch from './pages/PatientSearch';
 import PatientFlow from './pages/PatientFlow';
@@ -10,12 +10,15 @@ import Calls from './pages/Calls';
 import Messages from './pages/Messages';
 import Settings from './pages/SettingsEnhanced';
 import DentalManagementSystem from './pages/PatientPortal';
+import { patientPortalMockApi } from './services/mockPatientPortalApi';
 import './App.css';
 
 function Layout({ children }) {
   const location = useLocation();
   const isPortal = location.pathname.startsWith('/portal-patient');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const defaultPortalId = patientPortalMockApi.getDefaultPatientId();
+  const portalLink = defaultPortalId ? `/portal-patient/${defaultPortalId}` : '/portal-patient';
 
   useEffect(() => {
     if (!isPortal) {
@@ -52,7 +55,7 @@ function Layout({ children }) {
         <Link to="/calls" className="nav-tab">📞 Calls</Link>
         <Link to="/messages" className="nav-tab">💬 Messages</Link>
         <Link to="/settings" className="nav-tab">⚙️ Settings</Link>
-        <Link to="/portal-patient" className="nav-tab">⚙️ Patient Portal</Link>
+        <Link to={portalLink} className="nav-tab">⚙️ Patient Portal</Link>
       </nav>
 
       <main className="main-content">{children}</main>
@@ -61,6 +64,8 @@ function Layout({ children }) {
 }
 
 function App() {
+  const defaultPortalId = patientPortalMockApi.getDefaultPatientId();
+
   return (
     <Router>
       <Layout>
@@ -74,7 +79,15 @@ function App() {
           <Route path="/calls" element={<Calls />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/portal-patient/*" element={<DentalManagementSystem />} />
+          <Route
+            path="/portal-patient"
+            element={
+              defaultPortalId
+                ? <Navigate to={`/portal-patient/${defaultPortalId}`} replace />
+                : <DentalManagementSystem />
+            }
+          />
+          <Route path="/portal-patient/:patNum/*" element={<DentalManagementSystem />} />
         </Routes>
       </Layout>
     </Router>

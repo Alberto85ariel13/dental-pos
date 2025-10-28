@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './CallCenter.css';
 
 function CallCenter() {
@@ -15,6 +16,14 @@ function CallCenter() {
   const [playingAudio, setPlayingAudio] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [callNotes, setCallNotes] = useState('');
+
+  const getPatientDisplayName = (patient) => {
+    if (!patient) return '';
+    if (patient.patientName) return patient.patientName;
+    const first = patient.fName ?? '';
+    const last = patient.lName ?? '';
+    return `${first} ${last}`.trim();
+  };
 
   const dispositions = {
     answered: { label: 'Answered', color: '#4caf50', icon: '📞' },
@@ -49,7 +58,7 @@ function CallCenter() {
 
     try {
       const result = await OpenDentalService.initiateCall(selectedPatient, callNotes);
-      alert(`✅ Call initiated to ${selectedPatient.patientName}\n\nCall ID: ${result.callSid}`);
+      alert(`✅ Call initiated to ${getPatientDisplayName(selectedPatient)}\n\nCall ID: ${result.callSid}`);
       setShowMakeCallModal(false);
       setSelectedPatient(null);
       setCallNotes('');
@@ -153,7 +162,13 @@ function CallCenter() {
                 </div>
 
                 <div className="call-info">
-                  <div className="call-patient-name">{call.patientName}</div>
+                <div className="call-patient-name">
+                  {call.patientName ? (
+                    <PatientLink patNum={call.patNum}>{call.patientName}</PatientLink>
+                  ) : (
+                    call.phoneNumber
+                  )}
+                </div>
                   <div className="call-details">
                     <span>{call.phoneNumber}</span><span className="separator">•</span>
                     <span>{new Date(call.timestamp).toLocaleString()}</span><span className="separator">•</span>
@@ -196,7 +211,16 @@ function CallCenter() {
       {showCallModal && selectedCall && (
         <div className="modal-overlay" onClick={() => setShowCallModal(false)}>
           <div className="modal-content large" onClick={(e) => e.stopPropagation()}>
-            <h3>Call Details - {selectedCall.patientName}</h3>
+            <h3>
+              Call Details -{' '}
+              {selectedCall.patientName ? (
+                <PatientLink patNum={selectedCall.patNum} stopPropagation>
+                  {selectedCall.patientName}
+                </PatientLink>
+              ) : (
+                selectedCall.phoneNumber
+              )}
+            </h3>
             
             {selectedCall.recordingUrl && (
               <div className="recording-section">
@@ -247,7 +271,14 @@ function CallCenter() {
             <h3>Make Call</h3>
             {selectedPatient ? (
               <div className="selected-patient-box">
-                <div>{selectedPatient.patientName} - {selectedPatient.patientPhone}</div>
+                <div>
+                  <PatientLink patNum={selectedPatient.patNum} stopPropagation>
+                    {getPatientDisplayName(selectedPatient)}
+                  </PatientLink>
+                  {(selectedPatient.patientPhone || selectedPatient.phone) && (
+                    <> - {selectedPatient.patientPhone ?? selectedPatient.phone}</>
+                  )}
+                </div>
                 <button className="btn btn-secondary btn-small" onClick={selectPatientForCall}>Change</button>
               </div>
             ) : (

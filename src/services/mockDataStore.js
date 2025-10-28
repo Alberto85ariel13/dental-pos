@@ -433,7 +433,12 @@ const baseStore = {
     ],
   },
   patientProfile: {
+    patNum: 1001,
     name: 'Sarah Johnson',
+    email: 'sarah.j@email.com',
+    phone: '(555) 123-4567',
+    insurance: 'Delta Dental PPO',
+    lastVisit: '2025-08-15',
     autopayEnrolled: true,
     autopayFailing: true,
     failedPaymentReason: 'Card expired - please update payment method',

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Calendar, Clock, DollarSign, FileText, MessageSquare, User, Bell, LogOut, CreditCard, Plus, Video, Search, CheckCircle, Users, Home, Send, Edit, X, Star, TrendingUp, CheckSquare, Mail, Smartphone, AlertTriangle, RefreshCw, Filter, ChevronRight } from 'lucide-react';
 import { patientPortalMockApi } from '../services/mockPatientPortalApi';
 
@@ -42,6 +43,7 @@ const determineDayLabel = (dateString) => {
 };
 
 const DentalManagementSystem = () => {
+  const { patNum: patNumParam } = useParams();
   const [currentView, setCurrentView] = useState('patient-portal');
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -69,6 +71,7 @@ const DentalManagementSystem = () => {
   const [claims, setClaims] = useState([]);
   const [providers, setProviders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [savedCards] = useState([
     { id: 1, last4: '4242', brand: 'Visa', expiry: '12/26', isDefault: true, status: 'active' },
     { id: 2, last4: '5555', brand: 'Mastercard', expiry: '03/27', isDefault: false, status: 'failed' }
@@ -78,16 +81,36 @@ const DentalManagementSystem = () => {
     let isMounted = true;
 
     const loadMockData = async () => {
-      const snapshot = await patientPortalMockApi.getPatientPortalSnapshot();
+      setIsLoading(true);
+      setLoadError(null);
 
-      if (!isMounted) return;
+      try {
+        const snapshot = await patientPortalMockApi.getPatientPortalSnapshot(patNumParam ?? null);
 
-      setPatientData(snapshot.patient);
-      setOfficeData(snapshot.office);
-      setAppointments(snapshot.appointments);
-      setClaims(snapshot.claims);
-      setProviders(snapshot.providers);
-      setIsLoading(false);
+        if (!isMounted) return;
+
+        setPatientData(snapshot.patient);
+        setOfficeData(snapshot.office);
+        setAppointments(snapshot.appointments);
+        setClaims(snapshot.claims);
+        setProviders(snapshot.providers);
+        setSelectedPatient(null);
+      } catch (error) {
+        if (!isMounted) return;
+
+        console.error('Failed to load patient portal data', error);
+        setLoadError(error.message || 'Unable to load patient portal data.');
+        setPatientData(null);
+        setOfficeData(null);
+        setAppointments([]);
+        setClaims([]);
+        setProviders([]);
+        setSelectedPatient(null);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
     };
 
     loadMockData();
@@ -95,7 +118,7 @@ const DentalManagementSystem = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [patNumParam]);
 
   useEffect(() => {
     setOfficeData(prev => {
@@ -103,7 +126,7 @@ const DentalManagementSystem = () => {
 
       return {
         ...prev,
-        stats: patientPortalMockApi.computeStats(appointments, prev.openRequests),
+        stats: patientPortalMockApi.computeStats(undefined, prev.openRequests),
       };
     });
   }, [appointments]);
@@ -206,6 +229,7 @@ const DentalManagementSystem = () => {
 
     try {
       const newAppointment = await patientPortalMockApi.addAppointment({
+        patNum: patientData.patNum,
         patient: patientData.name,
         providerId,
         provider: provider?.name,
@@ -246,8 +270,16 @@ const DentalManagementSystem = () => {
     [appointments]
   );
 
-  if (isLoading || !patientData || !officeData) {
+  if (isLoading) {
     return <div className="p-6 text-slate-500">Loading patient portal...</div>;
+  }
+
+  if (loadError) {
+    return <div className="p-6 text-red-600">{loadError}</div>;
+  }
+
+  if (!patientData || !officeData) {
+    return <div className="p-6 text-slate-500">Unable to load patient portal data.</div>;
   }
 
   const renderPatientOverview = () => (
