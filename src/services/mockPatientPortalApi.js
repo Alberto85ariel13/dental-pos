@@ -1,232 +1,184 @@
-const providerList = [
-  { id: 1, name: 'Dr. Michael Chen', specialty: 'General Dentistry', slotDuration: 30, color: 'blue' },
-  { id: 2, name: 'Dr. Lisa Park', specialty: 'Orthodontics', slotDuration: 60, color: 'purple' },
-];
-
-const appointments = [
-  {
-    id: 1,
-    day: 'today',
-    date: '2025-10-25',
-    time: '09:00 AM',
-    patient: 'Sarah Johnson',
-    providerId: 1,
-    provider: 'Dr. Michael Chen',
-    providerColor: 'blue',
-    type: 'Routine Checkup',
-    status: 'confirmed',
-    room: 'Room 1',
-    reason: '6-month checkup',
-    estimatedCost: 150,
-    paymentStatus: 'paid',
-  },
-  {
-    id: 2,
-    day: 'today',
-    date: '2025-10-25',
-    time: '10:30 AM',
-    patient: 'Michael Chen',
-    providerId: 1,
-    provider: 'Dr. Michael Chen',
-    providerColor: 'blue',
-    type: 'Crown Fitting',
-    status: 'scheduled',
-    room: null,
-    reason: 'Crown follow up',
-    estimatedCost: 950,
-    paymentStatus: 'pending',
-  },
-  {
-    id: 3,
-    day: 'today',
-    date: '2025-10-25',
-    time: '12:00 PM',
-    patient: 'David Rodriguez',
-    providerId: 2,
-    provider: 'Dr. Lisa Park',
-    providerColor: 'purple',
-    type: 'Consultation',
-    status: 'waiting',
-    room: 'Room 3',
-    reason: 'Orthodontics consult',
-    estimatedCost: 120,
-    paymentStatus: 'pending',
-  },
-  {
-    id: 4,
-    day: 'today',
-    date: '2025-10-25',
-    time: '02:00 PM',
-    patient: 'Emily Watson',
-    providerId: 2,
-    provider: 'Dr. Lisa Park',
-    providerColor: 'purple',
-    type: 'Whitening',
-    status: 'completed',
-    room: 'Room 2',
-    reason: 'In-office whitening',
-    estimatedCost: 450,
-    paymentStatus: 'paid',
-  },
-  {
-    id: 101,
-    day: 'tomorrow',
-    date: '2025-10-26',
-    time: '09:30 AM',
-    patient: 'Laura Hall',
-    providerId: 1,
-    provider: 'Dr. Michael Chen',
-    providerColor: 'blue',
-    type: 'Cleaning',
-    status: 'scheduled',
-    room: null,
-    reason: 'Routine cleaning',
-    estimatedCost: 180,
-    paymentStatus: 'pending',
-  },
-  {
-    id: 102,
-    day: 'tomorrow',
-    date: '2025-10-26',
-    time: '11:00 AM',
-    patient: 'Robert Taylor',
-    providerId: 2,
-    provider: 'Dr. Lisa Park',
-    providerColor: 'purple',
-    type: 'Follow-up',
-    status: 'scheduled',
-    room: null,
-    reason: 'Brace follow up',
-    estimatedCost: 200,
-    paymentStatus: 'pending',
-  },
-];
-
-const claims = [
-  {
-    id: 1,
-    date: 'Sep 15, 2025',
-    procedure: 'Root Canal',
-    amount: 1200,
-    insurancePaid: 900,
-    patientOwes: 300,
-    status: 'partially_covered',
-    reason: 'Insurance covered 75% - maximum benefit reached',
-  },
-  {
-    id: 2,
-    date: 'Aug 20, 2025',
-    procedure: 'Crown',
-    amount: 150,
-    insurancePaid: 65,
-    patientOwes: 85,
-    status: 'pending',
-    reason: 'Claim pending insurance review - expected response in 7 days',
-  },
-];
-
-const officeState = {
-  openRequests: [
-    {
-      id: 1,
-      patient: 'Angela Martinez',
-      requestedDate: 'Oct 25, 2025',
-      preferredTime: 'Morning',
-      type: 'Cleaning',
-      requestDate: 'Oct 18, 2025',
-      phone: '(555) 123-4567',
-    },
-    {
-      id: 2,
-      patient: 'Thomas Wright',
-      requestedDate: 'Oct 26, 2025',
-      preferredTime: 'Afternoon',
-      type: 'Consultation',
-      requestDate: 'Oct 19, 2025',
-      phone: '(555) 234-5678',
-    },
-    {
-      id: 3,
-      patient: 'Rebecca Hill',
-      requestedDate: 'Oct 27, 2025',
-      preferredTime: 'Any',
-      type: 'Emergency',
-      requestDate: 'Oct 19, 2025',
-      phone: '(555) 345-6789',
-      urgent: true,
-    },
-  ],
-  rooms: [
-    { id: 1, name: 'Room 1', status: 'occupied', patient: 'John Smith' },
-    { id: 2, name: 'Room 2', status: 'available', patient: null },
-    { id: 3, name: 'Room 3', status: 'cleaning', patient: null },
-    { id: 4, name: 'Room 4', status: 'available', patient: null },
-  ],
-  recommendations: [
-    {
-      id: 1,
-      patient: 'Sarah Johnson',
-      type: '6-Month Cleaning',
-      dueDate: '2025-11-15',
-      lastVisit: '2025-05-15',
-      priority: 'high',
-      status: 'pending',
-    },
-    {
-      id: 2,
-      patient: 'John Smith',
-      type: 'Follow-up',
-      dueDate: '2025-11-01',
-      lastVisit: '2025-10-19',
-      priority: 'medium',
-      status: 'pending',
-    },
-  ],
-};
-
-const patientProfile = {
-  name: 'Sarah Johnson',
-  autopayEnrolled: true,
-  autopayFailing: true,
-  failedPaymentReason: 'Card expired - please update payment method',
-  messages: [
-    {
-      id: 1,
-      from: "Dr. Chen's Office",
-      subject: 'Appointment Confirmation',
-      message: 'Your appointment is confirmed for Oct 25 at 10:30 AM',
-      date: 'Oct 18, 2025',
-      time: '2:30 PM',
-      unread: true,
-    },
-    {
-      id: 2,
-      from: 'Billing Department',
-      subject: 'Payment Received',
-      message: 'Thank you for your payment of $150',
-      date: 'Oct 15, 2025',
-      time: '11:00 AM',
-      unread: true,
-    },
-    {
-      id: 3,
-      from: "Dr. Chen's Office",
-      subject: 'Insurance Update',
-      message: 'Your insurance claim has been processed',
-      date: 'Oct 10, 2025',
-      time: '3:45 PM',
-      unread: false,
-    },
-  ],
-  upcomingRecommendations: [
-    { id: 1, type: '6-Month Cleaning', dueDate: 'Nov 15, 2025', provider: 'Dr. Chen', priority: 'high' },
-    { id: 2, type: 'Annual Checkup', dueDate: 'Dec 1, 2025', provider: 'Dr. Park', priority: 'medium' },
-  ],
-};
+import {
+  mockAppointments,
+  mockClaims,
+  mockOfficeState,
+  mockPatientProfile,
+  mockProviders,
+  mockPatients,
+} from './mockDataStore';
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
-const computeStats = (apptList = appointments, requests = officeState.openRequests) => {
+const determineDayLabel = (dateString) => {
+  if (!dateString) return 'upcoming';
+  const selectedDate = new Date(dateString);
+  if (Number.isNaN(selectedDate.getTime())) return 'upcoming';
+
+  const today = new Date();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startOfSelected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+  const diffInDays = Math.round((startOfSelected - startOfToday) / (1000 * 60 * 60 * 24));
+
+  if (diffInDays === 0) return 'today';
+  if (diffInDays === 1) return 'tomorrow';
+  if (diffInDays < 0) return 'past';
+  return 'upcoming';
+};
+
+const formatTimeFromIso = (isoString) => {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+};
+
+const parseTimeTo24Hour = (timeString) => {
+  if (!timeString) {
+    return { hour: 9, minute: 0 };
+  }
+
+  const hasMeridiem = /am|pm/i.test(timeString);
+  if (hasMeridiem) {
+    const [timePart, meridiemRaw] = timeString.trim().split(/\s+/);
+    const [hourStr, minuteStr] = timePart.split(':');
+    let hour = parseInt(hourStr, 10);
+    const minute = parseInt(minuteStr ?? '0', 10);
+    const meridiem = meridiemRaw?.toUpperCase();
+
+    if (meridiem === 'PM' && hour < 12) hour += 12;
+    if (meridiem === 'AM' && hour === 12) hour = 0;
+
+    return { hour, minute };
+  }
+
+  const [hourStr, minuteStr] = timeString.split(':');
+  return {
+    hour: parseInt(hourStr, 10),
+    minute: parseInt(minuteStr ?? '0', 10),
+  };
+};
+
+const toIsoDateTime = (dateString, timeString) => {
+  if (!dateString) return null;
+  const { hour, minute } = parseTimeTo24Hour(timeString);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return `${dateString}T09:00:00`;
+  const hourStr = hour.toString().padStart(2, '0');
+  const minuteStr = minute.toString().padStart(2, '0');
+  return `${dateString}T${hourStr}:${minuteStr}:00`;
+};
+
+const resolveProvider = (appointment) => {
+  if (!appointment) return {};
+  const provider = mockProviders.find((p) => p.id === appointment.providerId)
+    || mockProviders.find((p) => p.name === appointment.provider)
+    || mockProviders.find((p) => p.name === appointment.providerName);
+
+  if (!provider) {
+    return {
+      providerId: appointment.providerId ?? null,
+      providerName: appointment.provider ?? appointment.providerName ?? '',
+      providerColor: appointment.providerColor ?? 'blue',
+    };
+  }
+
+  return {
+    providerId: provider.id,
+    providerName: provider.name,
+    providerColor: provider.color,
+  };
+};
+
+const resolvePatient = (appointment) => {
+  if (!appointment) return {};
+  const patientFromId = appointment.patNum
+    ? mockPatients.find((p) => p.patNum === appointment.patNum)
+    : null;
+
+  const patientNameFromInput = appointment.patient
+    || appointment.patientName
+    || (patientFromId ? `${patientFromId.fName} ${patientFromId.lName}` : '');
+
+  const patientRecord = patientFromId
+    || mockPatients.find((p) => `${p.fName} ${p.lName}` === patientNameFromInput);
+
+  if (!patientRecord) {
+    return {
+      patNum: appointment.patNum ?? null,
+      patientName: patientNameFromInput,
+    };
+  }
+
+  return {
+    patNum: patientRecord.patNum,
+    patientName: `${patientRecord.fName} ${patientRecord.lName}`,
+  };
+};
+
+const normalizeAppointmentPayload = (appointment) => {
+  const providerInfo = resolveProvider(appointment);
+  const patientInfo = resolvePatient(appointment);
+
+  let { aptDateTime, date, time } = appointment;
+
+  if (aptDateTime) {
+    if (!date) {
+      date = aptDateTime.split('T')[0];
+    }
+    if (!time) {
+      time = formatTimeFromIso(aptDateTime);
+    }
+  } else if (date && time) {
+    aptDateTime = toIsoDateTime(date, time);
+  } else if (date) {
+    aptDateTime = toIsoDateTime(date, '09:00 AM');
+    time = formatTimeFromIso(aptDateTime);
+  }
+
+  const lengthMinutes = appointment.lengthMinutes
+    ?? appointment.duration
+    ?? mockProviders.find((p) => p.id === providerInfo.providerId)?.slotDuration
+    ?? 30;
+
+  const appointmentType = appointment.type
+    ?? appointment.procedureDescription
+    ?? appointment.reason
+    ?? 'General Appointment';
+
+  const procedureCode = appointment.procedureCode ?? null;
+  const procedureDescription = appointment.procedureDescription ?? appointmentType;
+
+  const resolvedDate = date ?? (aptDateTime ? aptDateTime.split('T')[0] : null);
+  const resolvedTime = time ?? (aptDateTime ? formatTimeFromIso(aptDateTime) : '09:00 AM');
+
+  return {
+    id: appointment.id,
+    aptNum: appointment.aptNum,
+    patNum: patientInfo.patNum,
+    patient: patientInfo.patientName,
+    patientName: patientInfo.patientName,
+    providerId: providerInfo.providerId,
+    provider: providerInfo.providerName,
+    providerName: providerInfo.providerName,
+    providerColor: providerInfo.providerColor,
+    type: appointmentType,
+    procedureCode,
+    procedureDescription,
+    reason: appointment.reason ?? appointmentType,
+    status: appointment.status ?? 'scheduled',
+    room: appointment.room ?? appointment.operatory ?? null,
+    operatory: appointment.operatory ?? appointment.room ?? null,
+    estimatedCost: appointment.estimatedCost ?? 0,
+    paymentStatus: appointment.paymentStatus ?? 'pending',
+    lengthMinutes,
+    day: appointment.day ?? determineDayLabel(resolvedDate),
+    date: resolvedDate,
+    time: resolvedTime,
+    aptDateTime,
+    note: appointment.note ?? '',
+  };
+};
+
+const computeStats = (apptList = mockAppointments, requests = mockOfficeState.openRequests) => {
   const todays = apptList.filter((appt) => appt.day === 'today');
   const completed = apptList.filter((appt) => appt.status === 'completed');
   const revenue = apptList.reduce((total, appt) => {
@@ -242,12 +194,12 @@ const computeStats = (apptList = appointments, requests = officeState.openReques
   };
 };
 
-const computeNextAppointment = (apptList = appointments) => {
+const computeNextAppointment = (apptList = mockAppointments) => {
   const upcoming = apptList
     .filter((appt) => ['scheduled', 'confirmed', 'waiting'].includes(appt.status))
     .sort((a, b) => {
-      const dateA = new Date(`${a.date} ${a.time}`);
-      const dateB = new Date(`${b.date} ${b.time}`);
+      const dateA = new Date(a.aptDateTime ?? `${a.date} ${a.time}`);
+      const dateB = new Date(b.aptDateTime ?? `${b.date} ${b.time}`);
       return dateA.getTime() - dateB.getTime();
     })[0];
 
@@ -262,7 +214,7 @@ const computeNextAppointment = (apptList = appointments) => {
   }
 
   return {
-    date: new Date(upcoming.date).toLocaleDateString('en-US', {
+    date: new Date(upcoming.aptDateTime ?? `${upcoming.date} ${upcoming.time}`).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -274,87 +226,118 @@ const computeNextAppointment = (apptList = appointments) => {
   };
 };
 
-const computeBalance = (claimList = claims) =>
-  claimList.reduce((total, claim) => total + Number(claim.patientOwes || 0), 0);
+const computeBalance = (claimList = mockClaims) =>
+  claimList.reduce((total, claim) => total + Number(claim.patientOwes ?? claim.patientResponsibility ?? 0), 0);
 
 export const patientPortalMockApi = {
   async getPatientPortalSnapshot() {
-    const clonedAppointments = clone(appointments);
-    const clonedClaims = clone(claims);
-
     return {
       patient: {
-        ...clone(patientProfile),
-        balance: computeBalance(claims),
-        nextAppointment: computeNextAppointment(appointments),
-        claims: clonedClaims,
+        ...clone(mockPatientProfile),
+        balance: computeBalance(mockClaims),
+        nextAppointment: computeNextAppointment(mockAppointments),
+        claims: clone(mockClaims),
       },
-      appointments: clonedAppointments,
-      claims: clonedClaims,
+      appointments: clone(mockAppointments),
+      claims: clone(mockClaims),
       office: {
-        ...clone(officeState),
-        stats: computeStats(appointments, officeState.openRequests),
+        ...clone(mockOfficeState),
+        stats: computeStats(mockAppointments, mockOfficeState.openRequests),
       },
-      providers: clone(providerList),
+      providers: clone(mockProviders),
     };
   },
 
+  async getPatients() {
+    return clone(mockPatients);
+  },
+
+  async getPatient(patNum) {
+    const patient = mockPatients.find((p) => p.patNum === patNum);
+    return patient ? clone(patient) : null;
+  },
+
   async getAppointments(filterDay = null) {
-    const list = filterDay ? appointments.filter((appt) => appt.day === filterDay) : appointments;
+    const list = filterDay ? mockAppointments.filter((appt) => appt.day === filterDay) : mockAppointments;
     return clone(list);
   },
 
   async addAppointment(appointment) {
-    const newAppointment = {
-      id: Date.now(),
-      providerId: appointment.providerId,
-      provider: providerList.find((p) => p.id === appointment.providerId)?.name || appointment.provider,
-      providerColor: providerList.find((p) => p.id === appointment.providerId)?.color || 'blue',
-      paymentStatus: 'pending',
-      ...appointment,
+    const normalizedInput = normalizeAppointmentPayload(appointment);
+    const id = normalizedInput?.id ?? Date.now();
+    const withIdentifiers = {
+      ...normalizedInput,
+      id,
+      aptNum: normalizedInput?.aptNum ?? id,
     };
 
-    appointments.push(newAppointment);
-    return clone(newAppointment);
+    mockAppointments.push(withIdentifiers);
+    return clone(withIdentifiers);
   },
 
-  async updateAppointment(id, updates) {
-    const index = appointments.findIndex((appt) => appt.id === id);
+  async updateAppointment(identifier, updates) {
+    const index = mockAppointments.findIndex(
+      (appt) => appt.id === identifier || appt.aptNum === identifier,
+    );
     if (index === -1) return null;
 
-    appointments[index] = {
-      ...appointments[index],
-      ...updates,
+    const normalizedUpdates = normalizeAppointmentPayload({ ...mockAppointments[index], ...updates, id: mockAppointments[index].id, aptNum: mockAppointments[index].aptNum });
+    mockAppointments[index] = {
+      ...mockAppointments[index],
+      ...normalizedUpdates,
     };
 
-    return clone(appointments[index]);
+    return clone(mockAppointments[index]);
   },
 
   async getClaims(status = null) {
-    const list = status ? claims.filter((claim) => claim.status === status) : claims;
+    const list = status ? mockClaims.filter((claim) => claim.status === status) : mockClaims;
     return clone(list);
   },
 
-  async updateClaim(id, updates) {
-    const index = claims.findIndex((claim) => claim.id === id);
+  async updateClaim(identifier, updates) {
+    const index = mockClaims.findIndex(
+      (claim) => claim.id === identifier || claim.claimNum === identifier,
+    );
     if (index === -1) return null;
 
-    claims[index] = {
-      ...claims[index],
+    mockClaims[index] = {
+      ...mockClaims[index],
       ...updates,
+      patientOwes: updates.patientOwes ?? updates.patientResponsibility ?? mockClaims[index].patientOwes,
+      patientResponsibility: updates.patientResponsibility ?? updates.patientOwes ?? mockClaims[index].patientResponsibility,
     };
 
-    return clone(claims[index]);
+    return clone(mockClaims[index]);
   },
 
   async addClaim(claim) {
+    const patientInfo = resolvePatient(claim);
+    const id = Date.now();
     const newClaim = {
-      id: Date.now(),
-      status: 'pending',
-      ...claim,
+      id,
+      claimNum: id,
+      patNum: patientInfo.patNum,
+      patientName: patientInfo.patientName,
+      patientEmail: claim.patientEmail ?? '',
+      patientPhone: claim.patientPhone ?? '',
+      insurance: claim.insurance ?? '',
+      serviceDate: claim.serviceDate ?? new Date().toISOString().split('T')[0],
+      dueDate: claim.dueDate ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      totalBilled: claim.totalBilled ?? claim.amount ?? 0,
+      insurancePaid: claim.insurancePaid ?? 0,
+      patientResponsibility: claim.patientResponsibility ?? claim.patientOwes ?? 0,
+      patientOwes: claim.patientOwes ?? claim.patientResponsibility ?? 0,
+      status: claim.status ?? 'pending',
+      procedures: clone(claim.procedures ?? []),
+      lastReminderSent: claim.lastReminderSent ?? null,
+      date: claim.date ?? new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      procedure: claim.procedure ?? (claim.procedures?.[0]?.description ?? ''),
+      amount: claim.amount ?? claim.totalBilled ?? 0,
+      reason: claim.reason ?? '',
     };
 
-    claims.push(newClaim);
+    mockClaims.push(newClaim);
     return clone(newClaim);
   },
 
@@ -362,4 +345,3 @@ export const patientPortalMockApi = {
   computeBalance,
   computeNextAppointment,
 };
-
