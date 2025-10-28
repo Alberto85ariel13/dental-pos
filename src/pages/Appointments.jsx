@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './Appointments.css';
 
 function Appointments() {
@@ -99,7 +100,9 @@ function Appointments() {
                 <div className="appointment-patient">
                   <span className="patient-icon">👤</span>
                   <div>
-                    <div className="patient-name">{apt.patientName}</div>
+                    <PatientLink patNum={apt.patNum} className="patient-name">
+                      {apt.patientName}
+                    </PatientLink>
                     <div className="patient-num">Patient #{apt.patNum}</div>
                   </div>
                 </div>

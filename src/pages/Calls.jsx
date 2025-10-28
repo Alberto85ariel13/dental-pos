@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './Calls.css';
 
 function Calls() {
@@ -160,7 +161,13 @@ function Calls() {
                   {getDispositionIcon(call.disposition)}
                 </div>
                 <div className="call-info">
-                  <div className="call-patient">{call.patientName || call.toNumber}</div>
+                <div className="call-patient">
+                  {call.patientName ? (
+                    <PatientLink patNum={call.patNum}>{call.patientName}</PatientLink>
+                  ) : (
+                    call.toNumber
+                  )}
+                </div>
                   <div className="call-details">
                     <span className="call-type">{call.purpose}</span>
                     <span className="call-time">{new Date(call.timestamp).toLocaleString()}</span>
@@ -238,7 +245,16 @@ function Calls() {
             
             {selectedCall && (
               <div className="transcript-header">
-                <div><strong>Patient:</strong> {selectedCall.patientName}</div>
+                <div>
+                  <strong>Patient:</strong>{' '}
+                  {selectedCall.patientName ? (
+                    <PatientLink patNum={selectedCall.patNum} stopPropagation>
+                      {selectedCall.patientName}
+                    </PatientLink>
+                  ) : (
+                    selectedCall.toNumber
+                  )}
+                </div>
                 <div><strong>Date:</strong> {new Date(selectedCall.timestamp).toLocaleString()}</div>
                 <div><strong>Duration:</strong> {formatDuration(selectedCall.duration)}</div>
               </div>

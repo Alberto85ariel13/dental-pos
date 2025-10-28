@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './Schedule.css';
 
 function Schedule() {
@@ -221,7 +222,11 @@ function Schedule() {
           <div className="summary-details">
             <div className="summary-row">
               <span>Patient:</span>
-              <strong>{selectedPatient.fName} {selectedPatient.lName}</strong>
+              <strong>
+                <PatientLink patNum={selectedPatient.patNum}>
+                  {selectedPatient.fName} {selectedPatient.lName}
+                </PatientLink>
+              </strong>
             </div>
             <div className="summary-row">
               <span>Procedure:</span>

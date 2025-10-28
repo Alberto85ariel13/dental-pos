@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './PatientFlow.css';
 
 function PatientFlow() {
@@ -296,7 +297,11 @@ function PatientFlow() {
               <div className="patient-main-info">
                 <div className="patient-header-row">
                   <div className="patient-name-section">
-                    <h3>{patient.patientName}</h3>
+                    <h3>
+                      <PatientLink patNum={patient.patNum}>
+                        {patient.patientName}
+                      </PatientLink>
+                    </h3>
                     <span className="patient-id">#{patient.patNum}</span>
                   </div>
                   <div 
@@ -415,7 +420,13 @@ function PatientFlow() {
         <div className="modal-overlay" onClick={() => setShowRoomModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Move Patient to Room</h3>
-            <p className="modal-subtitle">{selectedPatient?.patientName}</p>
+            <p className="modal-subtitle">
+              {selectedPatient?.patientName ? (
+                <PatientLink patNum={selectedPatient.patNum} stopPropagation>
+                  {selectedPatient.patientName}
+                </PatientLink>
+              ) : null}
+            </p>
             
             <div className="rooms-grid">
               {rooms.map((room) => (
@@ -572,7 +583,13 @@ function PatientFlow() {
         <div className="modal-overlay" onClick={() => setShowEligibilityModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Insurance Eligibility</h3>
-            <p className="modal-subtitle">{selectedPatient?.patientName}</p>
+            <p className="modal-subtitle">
+              {selectedPatient?.patientName ? (
+                <PatientLink patNum={selectedPatient.patNum} stopPropagation>
+                  {selectedPatient.patientName}
+                </PatientLink>
+              ) : null}
+            </p>
             
             {checkingEligibility ? (
               <div className="checking-state">

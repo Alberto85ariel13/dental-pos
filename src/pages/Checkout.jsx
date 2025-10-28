@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './Checkout.css';
 
 function Checkout() {
@@ -75,7 +76,9 @@ function Checkout() {
           <div className="patient-card selected">
             <div className="patient-info">
               <div className="patient-name">
-                {selectedPatient.fName} {selectedPatient.lName}
+                <PatientLink patNum={selectedPatient.patNum}>
+                  {selectedPatient.fName} {selectedPatient.lName}
+                </PatientLink>
               </div>
               <div className="patient-details">
                 #{selectedPatient.patNum} • {selectedPatient.insurance}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import OpenDentalService from '../services/OpenDentalService';
+import PatientLink from '../components/PatientLink';
 import './OpenClaims.css';
 
 function OpenClaims() {
@@ -250,7 +251,7 @@ function OpenClaims() {
                 <div className="claim-info">
                   <div className="claim-number">Claim #{claim.claimNum}</div>
                   <div className="patient-name">
-                    👤 {claim.patientName}
+                    👤 <PatientLink patNum={claim.patNum}>{claim.patientName}</PatientLink>
                   </div>
                 </div>
                 <div
