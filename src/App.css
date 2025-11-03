@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;
+  background: #f1f5f9;
 }
 
 .header {
@@ -39,7 +40,7 @@
 .nav-tabs {
   display: flex;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.95);
+  background: white;
   padding: 15px;
   border-radius: 16px;
   margin-bottom: 20px;
@@ -73,7 +74,7 @@
 }
 
 .main-content {
-  background: #f1f5f9 !important;
+  background: white !important;
   padding: 30px;
   border-radius: 0px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
