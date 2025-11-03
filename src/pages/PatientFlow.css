@@ -40,7 +40,7 @@
 }
 
 .status-card.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0A54C2;
   color: white;
   border-left-color: transparent;
 }
@@ -110,7 +110,7 @@
   justify-content: center;
   min-width: 100px;
   padding: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0A54C2;
   border-radius: 10px;
   color: white;
 }
@@ -316,7 +316,7 @@
 }
 
 .room-option.selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0A54C2;
   color: white;
   border-color: transparent;
 }

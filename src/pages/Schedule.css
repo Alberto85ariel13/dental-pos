@@ -1,5 +1,5 @@
 .schedule-page {
-  max-width: 900px;
+  max-width: 100%;
 }
 
 .page-title {
@@ -95,7 +95,7 @@
 }
 
 .procedure-option.selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a54c2;
   color: white;
   border-color: transparent;
 }
@@ -128,7 +128,7 @@
 }
 
 .date-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a54c2;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -172,7 +172,7 @@
 }
 
 .time-option.selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a54c2;
   color: white;
   border-color: transparent;
 }
@@ -198,7 +198,7 @@
 }
 
 .duration-option.selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a54c2;
   color: white;
   border-color: transparent;
 }
@@ -221,7 +221,7 @@
 }
 
 .appointment-summary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a54c2;
   padding: 25px;
   border-radius: 12px;
   color: white;
@@ -276,7 +276,7 @@
   align-items: center;
   gap: 12px;
   padding: 15px 20px;
-  background: #e3f2fd;
+  background: #1571c2;
   border-radius: 10px;
   border-left: 4px solid #2196f3;
 }
@@ -296,15 +296,15 @@
   .procedure-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
-  
+
   .time-grid {
     grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
   }
-  
+
   .duration-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }

@@ -200,7 +200,7 @@ To use real OpenDental data, configure the API settings in the Settings page.
 
 Edit the gradient colors in CSS files:
 ```css
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+background: #0A54C2;
 ```
 
 ### Add More Procedures

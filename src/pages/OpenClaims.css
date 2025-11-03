@@ -53,7 +53,7 @@
 }
 
 .filter-tab.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0A54C2;
   color: white;
 }
 
@@ -412,7 +412,7 @@
 }
 
 .aging-bucket.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0A54C2;
   color: white;
   border-left-color: transparent;
 }
