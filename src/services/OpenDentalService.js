@@ -1130,15 +1130,15 @@ class OpenDentalService {
     return amount >= settings.minAmount;
   }
 
-  // Create Advance payment plan application
+  // Create Avvance payment plan application
   async createAdvanceApplication(patientData, procedureAmount) {
     try {
       const settings = this.getAdvanceSettings();
       if (!settings || !settings.enabled) {
-        throw new Error('Advance BNPL not enabled');
+        throw new Error('Avvance BNPL not enabled');
       }
 
-      // Real Advance API call:
+      // Real Avvance API call:
       // const response = await axios.post('https://api.advance.com/v1/applications', {
       //   merchant_id: settings.merchantId,
       //   patient: {
@@ -1157,7 +1157,7 @@ class OpenDentalService {
       //   }
       // });
 
-      console.log('Creating Advance application:', patientData, procedureAmount);
+      console.log('Creating Avvance application:', patientData, procedureAmount);
       
       return {
         success: true,
@@ -1171,12 +1171,12 @@ class OpenDentalService {
         ]
       };
     } catch (error) {
-      console.error('Error creating Advance application:', error);
+      console.error('Error creating Avvance application:', error);
       throw error;
     }
   }
 
-  // Check Advance application status
+  // Check Avvance application status
   async checkAdvanceStatus(applicationId) {
     try {
       const settings = this.getAdvanceSettings();
@@ -1189,7 +1189,7 @@ class OpenDentalService {
       //   }
       // );
 
-      console.log('Checking Advance status:', applicationId);
+      console.log('Checking Avvance status:', applicationId);
       
       return {
         status: 'approved',
@@ -1198,12 +1198,12 @@ class OpenDentalService {
         firstPaymentDate: '2025-11-15'
       };
     } catch (error) {
-      console.error('Error checking Advance status:', error);
+      console.error('Error checking Avvance status:', error);
       throw error;
     }
   }
 
-  // Get Advance payment schedule
+  // Get Avvance payment schedule
   async getAdvancePaymentSchedule(applicationId) {
     try {
       console.log('Getting payment schedule:', applicationId);

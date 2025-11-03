@@ -23,7 +23,7 @@ function Settings() {
   const [twilioPhoneNumber, setTwilioPhoneNumber] = useState('');
   const [twilioAiEnabled, setTwilioAiEnabled] = useState(true);
   
-  // Advance (BNPL) settings
+  // Avvance (BNPL) settings
   const [advanceEnabled, setAdvanceEnabled] = useState(false);
   const [advanceApiKey, setAdvanceApiKey] = useState('');
   const [advanceMinAmount, setAdvanceMinAmount] = useState(500);
@@ -63,7 +63,7 @@ function Settings() {
       setTwilioAiEnabled(parsed.aiEnabled !== false);
     }
     
-    // Load Advance settings
+    // Load Avvance settings
     const advanceSettings = localStorage.getItem('advanceSettings');
     if (advanceSettings) {
       const parsed = JSON.parse(advanceSettings);
@@ -103,7 +103,7 @@ function Settings() {
         aiEnabled: twilioAiEnabled
       }));
       
-      // Save Advance settings
+      // Save Avvance settings
       localStorage.setItem('advanceSettings', JSON.stringify({
         enabled: advanceEnabled,
         apiKey: advanceApiKey,
@@ -164,7 +164,7 @@ function Settings() {
           className={`settings-tab ${activeTab === 'advance' ? 'active' : ''}`}
           onClick={() => setActiveTab('advance')}
         >
-          💳 Advance BNPL
+          💳 Avvance BNPL
         </button>
       </div>
 
@@ -408,11 +408,11 @@ function Settings() {
         </div>
       )}
 
-      {/* Advance BNPL Settings */}
+      {/* Avvance BNPL Settings */}
       {activeTab === 'advance' && (
         <div className="settings-content">
           <div className="settings-section">
-            <h3>Advance - Buy Now, Pay Later</h3>
+            <h3>Avvance - Consumer Finance</h3>
             
             <div className="form-group checkbox-group">
               <label>
@@ -421,7 +421,7 @@ function Settings() {
                   checked={advanceEnabled}
                   onChange={(e) => setAdvanceEnabled(e.target.checked)}
                 />
-                <span>Enable Advance BNPL</span>
+                <span>Enable Avvance BNPL</span>
               </label>
               <div className="form-hint">
                 Offer flexible payment plans for high-value procedures not covered by insurance
@@ -431,11 +431,11 @@ function Settings() {
             {advanceEnabled && (
               <>
                 <div className="form-group">
-                  <label>Advance API Key</label>
+                  <label>Avvance API Key</label>
                   <input
                     type="password"
                     className="form-input"
-                    placeholder="Enter Advance API key"
+                    placeholder="Enter Avvance API key"
                     value={advanceApiKey}
                     onChange={(e) => setAdvanceApiKey(e.target.value)}
                   />
@@ -459,7 +459,7 @@ function Settings() {
                 </div>
 
                 <div className="feature-list">
-                  <h4>Advance Features:</h4>
+                  <h4>Avvance Features:</h4>
                   <ul>
                     <li>💳 Flexible payment plans (3-24 months)</li>
                     <li>✅ Instant approval (90% approval rate)</li>
