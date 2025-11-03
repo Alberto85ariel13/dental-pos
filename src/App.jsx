@@ -62,7 +62,7 @@ function Layout({ children }) {
                 />
               </div>
               <span className="header-title ml-3 text-white">
-                Patient Portal
+                Strictly Healthcare
               </span>
             </div>
 
