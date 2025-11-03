@@ -1202,7 +1202,7 @@ const DentalManagementSystem = () => {
                 setShowClaimDetailsModal(false);
                 setShowPaymentModal(true);
               }}
-              className="flex-1 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+              className="flex-1 px-4 py-2 bg-[#0A54C2] text-white hover:bg-[#1571C2] rounded-lg"
             >
               Pay {formatCurrency(patientData.balance ?? 0)}
             </button>
@@ -1495,7 +1495,7 @@ const DentalManagementSystem = () => {
             >
               Cancel
             </button>
-            <button className="flex-1 px-4 py-2 bg-teal-500 text-white rounded-lg">
+            <button className="flex-1 px-4 py-2 bg-[#0A54C2] text-white hover:bg-[#1571C2] rounded-lg">
               Save Card
             </button>
           </div>
