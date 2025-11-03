@@ -34,13 +34,14 @@
   padding: 8px;
   border-radius: 12px;
   overflow-x: auto;
+  color: white;
 }
 
 .filter-tab {
   padding: 10px 20px;
   border: none;
   background: transparent;
-  color: #666;
+  color: white;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
@@ -53,7 +54,7 @@
 }
 
 .filter-tab.active {
-  background: #0A54C2;
+  background: #0a54c2;
   color: white;
 }
 
@@ -412,7 +413,7 @@
 }
 
 .aging-bucket.active {
-  background: #0A54C2;
+  background: #0a54c2;
   color: white;
   border-left-color: transparent;
 }
