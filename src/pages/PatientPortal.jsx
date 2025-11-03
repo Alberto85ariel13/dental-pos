@@ -595,7 +595,7 @@ const DentalManagementSystem = () => {
           ))}
           <button
             onClick={() => setShowCardModal(true)}
-            className="text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-2"
+            className="text-black flex items-center gap-1 mt-2"
           >
             <Plus className="w-4 h-4" />
             Add Card
