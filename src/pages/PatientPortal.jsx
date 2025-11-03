@@ -404,7 +404,7 @@ const DentalManagementSystem = () => {
 
   const renderPatientOverview = () => (
     <div className="space-y-6">
-      <div className="bg-[#0059D6] rounded-xl p-8 text-white">
+      <div className="bg-[#0A54C2] rounded-xl p-8 text-white">
         <h2 className="text-3xl font-bold mb-2">
           Welcome, {patientData.name}!
         </h2>
@@ -532,7 +532,7 @@ const DentalManagementSystem = () => {
                 </div>
                 <button
                   onClick={openAppointmentModal}
-                  className="px-4 py-2 bg-[#0059D6] text-white rounded-lg hover:bg-[#7b6ef6]"
+                  className="px-4 py-2 bg-[#0A54C2] text-white rounded-lg hover:bg-[#1571C2]"
                 >
                   Book Now
                 </button>
@@ -1218,15 +1218,10 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6 border-b flex items-center justify-between sticky top-0 bg-white">
-            <h3 className="text-2xl font-bold text-slate-800">
-              Book Appointment
-            </h3>
-            <button
-              onClick={closeAppointmentModal}
-              className="p-2 hover:bg-slate-100 rounded-lg"
-            >
-              <X className="w-5 h-5" />
+          <div className="p-6 border-b flex items-center justify-between sticky top-0 bg-[#0A54C2]">
+            <h3 className="text-2xl font-bold text-white">Book Appointment</h3>
+            <button onClick={closeAppointmentModal} className="p-2 rounded-lg">
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
 
@@ -1360,8 +1355,8 @@ const DentalManagementSystem = () => {
               disabled={isBookingAppointment}
               className={`flex-1 px-4 py-2 rounded-lg text-white ${
                 isBookingAppointment
-                  ? "bg-teal-300 cursor-not-allowed"
-                  : "bg-teal-500 hover:bg-teal-600"
+                  ? "bg-[#0A54C2] cursor-not-allowed"
+                  : "bg-[#0A54C2] hover:bg-[#1571C2]"
               }`}
             >
               {isBookingAppointment ? "Booking..." : "Book"}
@@ -1378,8 +1373,8 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-          <div className="p-6 border-b">
-            <h3 className="text-2xl font-bold text-slate-800">Make Payment</h3>
+          <div className="p-6 border-b bg-[#0A54C2]">
+            <h3 className="text-2xl font-bold text-white">Make Payment</h3>
           </div>
 
           <div className="p-6 space-y-4">
@@ -1427,7 +1422,7 @@ const DentalManagementSystem = () => {
             >
               Cancel
             </button>
-            <button className="flex-1 px-4 py-2 bg-teal-500 text-white rounded-lg">
+            <button className="flex-1 px-4 py-2 bg-[#0A54C2] text-white rounded-lg hover:bg-[#1571C2]">
               Pay Now
             </button>
           </div>
@@ -1515,11 +1510,11 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full h-[600px] flex flex-col">
-          <div className="bg-[#0059D6] p-6 border-b flex items-center justify-between">
+          <div className="bg-[#0A54C2] p-6 border-b flex items-center justify-between">
             <h3 className="text-xl font-bold text-white">Secure Chat</h3>
             <button
               onClick={() => setShowChatModal(false)}
-              className="p-2 hover:bg-slate-100 rounded-lg"
+              className="p-2 rounded-lg"
             >
               <X className="w-5 h-5 text-white" />
             </button>
@@ -1545,7 +1540,7 @@ const DentalManagementSystem = () => {
                 placeholder="Type message..."
                 className="flex-1 px-4 py-2 border rounded-lg"
               />
-              <button className="px-6 py-2 bg-teal-500 text-white rounded-lg">
+              <button className="px-6 py-2 bg-[#0A54C2] hover:bg-[#1571C2] text-white rounded-lg">
                 <Send className="w-4 h-4" />
               </button>
             </div>
@@ -1557,7 +1552,7 @@ const DentalManagementSystem = () => {
 
   return (
     <div className="min-h-screen bg-[#f1f5f9]">
-      <nav className="bg-[#0059D6] shadow-md rounded-lg max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-[#0A54C2] shadow-md rounded-lg max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -1582,14 +1577,14 @@ const DentalManagementSystem = () => {
                 <option value="patient-portal">Patient Portal</option>
                 <option value="office-dashboard">Office Dashboard</option>
               </select> */}
-              <button className="p-2 hover:bg-slate-100 rounded-lg relative text-white">
+              <button className="p-2  rounded-lg relative text-white">
                 <Bell className="w-5 h-5 text-white" />
                 {currentView === "patient-portal" &&
                   patientData.messages.filter((m) => m.unread).length > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
               </button>
-              <button className="p-2 hover:bg-slate-100 rounded-lg text-white">
+              <button className="p-2 rounded-lg text-white">
                 <LogOut className="w-5 h-5 text-white" />
               </button>
             </div>
@@ -1605,7 +1600,7 @@ const DentalManagementSystem = () => {
                 onClick={() => setActiveTab("overview")}
                 className={`px-4 py-2 rounded-lg font-medium ${
                   activeTab === "overview"
-                    ? "bg-[#0059D6] text-white "
+                    ? "bg-[#0A54C2] hover:bg-[#1571C2] text-white "
                     : "bg-white text-slate-700"
                 }`}
               >
@@ -1615,7 +1610,7 @@ const DentalManagementSystem = () => {
                 onClick={() => setActiveTab("messages")}
                 className={`px-4 py-2 rounded-lg font-medium relative ${
                   activeTab === "messages"
-                    ? "bg-[#0059D6] text-white"
+                    ? "bg-[#0A54C2] text-white"
                     : "bg-white text-slate-700"
                 }`}
               >
