@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import OpenDentalService from '../services/OpenDentalService';
-import PatientLink from '../components/PatientLink';
-import './Checkout.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import OpenDentalService from "../services/OpenDentalService";
+import PatientLink from "../components/PatientLink";
+import "./Checkout.css";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -12,12 +12,12 @@ function Checkout() {
 
   useEffect(() => {
     loadProcedures();
-    
+
     // Check if patient was selected from patient search
-    const patientData = sessionStorage.getItem('selectedPatient');
+    const patientData = sessionStorage.getItem("selectedPatient");
     if (patientData) {
       setSelectedPatient(JSON.parse(patientData));
-      sessionStorage.removeItem('selectedPatient');
+      sessionStorage.removeItem("selectedPatient");
     }
   }, []);
 
@@ -26,24 +26,24 @@ function Checkout() {
       const codes = await OpenDentalService.getProcedureCodes();
       setProcedures(codes);
     } catch (error) {
-      console.error('Error loading procedures:', error);
+      console.error("Error loading procedures:", error);
     }
   };
 
   const selectPatient = () => {
-    navigate('/patients?selectMode=true');
+    navigate("/patients?selectMode=true");
   };
 
   const addToCart = (procedure) => {
     if (!selectedPatient) {
-      alert('Please select a patient first');
+      alert("Please select a patient first");
       return;
     }
     setCart([...cart, { ...procedure, id: Date.now() }]);
   };
 
   const removeFromCart = (id) => {
-    setCart(cart.filter(item => item.id !== id));
+    setCart(cart.filter((item) => item.id !== id));
   };
 
   const calculateTotal = () => {
@@ -52,17 +52,27 @@ function Checkout() {
 
   const processPayment = () => {
     if (!selectedPatient) {
-      alert('Please select a patient first');
+      alert("Please select a patient first");
       return;
     }
     if (cart.length === 0) {
-      alert('Please add services to process payment');
+      alert("Please add services to process payment");
       return;
     }
 
     const total = calculateTotal();
-    if (window.confirm(`Process payment of $${total.toFixed(2)} for ${selectedPatient.fName} ${selectedPatient.lName}?`)) {
-      alert(`✅ Payment processed successfully!\n\nTotal: $${total.toFixed(2)}\nReceipt sent to ${selectedPatient.email}`);
+    if (
+      window.confirm(
+        `Process payment of $${total.toFixed(2)} for ${selectedPatient.fName} ${
+          selectedPatient.lName
+        }?`
+      )
+    ) {
+      alert(
+        `✅ Payment processed successfully!\n\nTotal: $${total.toFixed(
+          2
+        )}\nReceipt sent to ${selectedPatient.email}`
+      );
       setCart([]);
       setSelectedPatient(null);
     }
@@ -92,7 +102,9 @@ function Checkout() {
           <div className="select-patient-box" onClick={selectPatient}>
             <div className="select-icon">👤</div>
             <div className="select-text">Select Patient</div>
-            <div className="select-subtext">Click to search and select a patient</div>
+            <div className="select-subtext">
+              Click to search and select a patient
+            </div>
           </div>
         )}
       </div>
@@ -149,7 +161,10 @@ function Checkout() {
             <button className="btn btn-secondary" onClick={() => setCart([])}>
               Clear All
             </button>
-            <button className="btn btn-primary" onClick={processPayment}>
+            <button
+              className="btn btn-primary bg-[#0A54C2]"
+              onClick={processPayment}
+            >
               💳 Process Payment
             </button>
           </div>

@@ -71,7 +71,7 @@ function Appointments() {
             🔄 Refresh
           </button>
           <button
-            className="btn btn-primary"
+            className="btn btn-primary text-white"
             style={{ width: "15rem" }}
             onClick={() => (window.location.href = "/schedule")}
           >

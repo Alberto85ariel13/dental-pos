@@ -154,7 +154,7 @@
 
 .cart-item-code {
   font-size: 13px;
-  color: #667eea;
+  color: #1571c2;
 }
 
 .cart-item-right {
@@ -166,11 +166,11 @@
 .cart-item-fee {
   font-size: 18px;
   font-weight: 700;
-  color: #667eea;
+  color: #1571c2;
 }
 
 .total-bar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a54c2;
   padding: 20px;
   border-radius: 12px;
   display: flex;
@@ -209,24 +209,25 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a54c2;
   color: white;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
+  background: #1571c2;
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
 }
 
 .btn-secondary {
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #1571c2;
+  border: 2px solid #1571c2;
 }
 
 .btn-secondary:hover {
-  background: #667eea;
+  background: #1571C2;
   color: white;
 }
 
@@ -249,11 +250,11 @@
   .services-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
   }

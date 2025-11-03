@@ -38,12 +38,13 @@
 }
 
 .filter-tab:hover {
-  color: #667eea;
+  color: #1571c2;
 }
 
 .filter-tab.active {
   color: white;
-  border-bottom-color: #667eea;
+  border-bottom-color: #0a54c2;
+  background: #1571c2;
 }
 
 .calls-list {
