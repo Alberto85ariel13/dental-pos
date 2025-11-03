@@ -61,9 +61,7 @@ function Layout({ children }) {
                   className="w-full h-full object-contain rounded-lg"
                 />
               </div>
-              <span className="header-title ml-3 text-white">
-                Strictly Healthcare
-              </span>
+              <span className="header-title ml-3 text-white">Healthcare</span>
             </div>
 
             <div className="flex items-center gap-4">
