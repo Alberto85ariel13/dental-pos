@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import OpenDentalService from '../services/OpenDentalService';
-import PatientLink from '../components/PatientLink';
-import './Appointments.css';
+import React, { useState, useEffect } from "react";
+import OpenDentalService from "../services/OpenDentalService";
+import PatientLink from "../components/PatientLink";
+import "./Appointments.css";
 
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
@@ -15,11 +15,11 @@ function Appointments() {
   const loadAppointments = async () => {
     try {
       setLoading(true);
-      const dateStr = selectedDate.toISOString().split('T')[0];
+      const dateStr = selectedDate.toISOString().split("T")[0];
       const apts = await OpenDentalService.getAppointments(dateStr);
       setAppointments(apts);
     } catch (error) {
-      console.error('Error loading appointments:', error);
+      console.error("Error loading appointments:", error);
     } finally {
       setLoading(false);
     }
@@ -27,22 +27,22 @@ function Appointments() {
 
   const formatTime = (dateTimeStr) => {
     const date = new Date(dateTimeStr);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
       hour12: true,
     });
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      scheduled: '#667eea',
-      confirmed: '#4caf50',
-      arrived: '#ff9800',
-      completed: '#2196f3',
-      cancelled: '#f44336',
+      scheduled: "#667eea",
+      confirmed: "#4caf50",
+      arrived: "#ff9800",
+      completed: "#2196f3",
+      cancelled: "#f44336",
     };
-    return colors[status.toLowerCase()] || '#999';
+    return colors[status.toLowerCase()] || "#999";
   };
 
   return (
@@ -50,22 +50,31 @@ function Appointments() {
       <div className="appointments-header">
         <div>
           <h2 className="page-title">
-            {selectedDate.toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric',
+            {selectedDate.toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
             })}
           </h2>
           <p className="page-subtitle">
-            {appointments.length} appointment{appointments.length !== 1 ? 's' : ''}
+            {appointments.length} appointment
+            {appointments.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-secondary" onClick={loadAppointments}>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            className="btn btn-secondary"
+            style={{ width: "15rem" }}
+            onClick={loadAppointments}
+          >
             🔄 Refresh
           </button>
-          <button className="btn btn-primary" onClick={() => window.location.href = '/schedule'}>
+          <button
+            className="btn btn-primary"
+            style={{ width: "15rem" }}
+            onClick={() => (window.location.href = "/schedule")}
+          >
             ➕ Schedule New
           </button>
         </div>
@@ -89,13 +98,15 @@ function Appointments() {
               <div
                 className="appointment-time"
                 style={{
-                  background: `linear-gradient(135deg, ${getStatusColor(apt.status)} 0%, ${getStatusColor(apt.status)}dd 100%)`,
+                  background: `linear-gradient(135deg, ${getStatusColor(
+                    apt.status
+                  )} 0%, ${getStatusColor(apt.status)}dd 100%)`,
                 }}
               >
                 <div className="time-text">{formatTime(apt.aptDateTime)}</div>
                 <div className="duration-text">{apt.lengthMinutes} min</div>
               </div>
-              
+
               <div className="appointment-details">
                 <div className="appointment-patient">
                   <span className="patient-icon">👤</span>
@@ -125,7 +136,10 @@ function Appointments() {
                   </div>
                 </div>
 
-                <div className="status-badge" style={{ backgroundColor: getStatusColor(apt.status) }}>
+                <div
+                  className="status-badge"
+                  style={{ backgroundColor: getStatusColor(apt.status) }}
+                >
                   {apt.status}
                 </div>
               </div>

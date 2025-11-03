@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import OpenDentalService from '../services/OpenDentalService';
-import PatientLink from '../components/PatientLink';
-import './Messages.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import OpenDentalService from "../services/OpenDentalService";
+import PatientLink from "../components/PatientLink";
+import "./Messages.css";
 
 function Messages() {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [filterType, setFilterType] = useState('all');
+  const [filterType, setFilterType] = useState("all");
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
-  const [newRecipient, setNewRecipient] = useState('');
-  const [newRecipientName, setNewRecipientName] = useState('');
-  const [messageType, setMessageType] = useState('sms');
+  const [newRecipient, setNewRecipient] = useState("");
+  const [newRecipientName, setNewRecipientName] = useState("");
+  const [messageType, setMessageType] = useState("sms");
 
   useEffect(() => {
     loadConversations();
@@ -36,7 +36,7 @@ function Messages() {
       const data = await OpenDentalService.getConversations(filterType);
       setConversations(data);
     } catch (error) {
-      console.error('Error loading conversations:', error);
+      console.error("Error loading conversations:", error);
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ function Messages() {
       // Mark as read
       await OpenDentalService.markConversationRead(conversationId);
     } catch (error) {
-      console.error('Error loading messages:', error);
+      console.error("Error loading messages:", error);
     }
   };
 
@@ -62,14 +62,14 @@ function Messages() {
         conversationId: selectedConversation.conversationId,
         toNumber: selectedConversation.phoneNumber,
         message: newMessage,
-        type: selectedConversation.type // 'sms' or 'whatsapp'
+        type: selectedConversation.type, // 'sms' or 'whatsapp'
       });
 
-      setNewMessage('');
+      setNewMessage("");
       await loadMessages(selectedConversation.conversationId);
       await loadConversations(); // Refresh conversation list
     } catch (error) {
-      alert('Failed to send message');
+      alert("Failed to send message");
     } finally {
       setSending(false);
     }
@@ -77,7 +77,7 @@ function Messages() {
 
   const handleNewConversation = async () => {
     if (!newRecipient || !newMessage.trim()) {
-      alert('Please enter recipient and message');
+      alert("Please enter recipient and message");
       return;
     }
 
@@ -87,24 +87,24 @@ function Messages() {
         toNumber: newRecipient,
         patientName: newRecipientName,
         message: newMessage,
-        type: messageType
+        type: messageType,
       });
 
       setShowNewMessageModal(false);
-      setNewRecipient('');
-      setNewRecipientName('');
-      setNewMessage('');
+      setNewRecipient("");
+      setNewRecipientName("");
+      setNewMessage("");
       await loadConversations();
       setSelectedConversation(result.conversation);
     } catch (error) {
-      alert('Failed to start conversation');
+      alert("Failed to start conversation");
     } finally {
       setSending(false);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -116,13 +116,19 @@ function Messages() {
     const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } else if (diffDays === 1) {
-      return 'Yesterday';
+      return "Yesterday";
     } else if (diffDays < 7) {
-      return date.toLocaleDateString('en-US', { weekday: 'short' });
+      return date.toLocaleDateString("en-US", { weekday: "short" });
     } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
     }
   };
 
@@ -135,22 +141,42 @@ function Messages() {
         <div className="conversations-sidebar">
           <div className="sidebar-header">
             <h3>💬 Messages</h3>
-            <button className="btn btn-primary btn-small" onClick={() => setShowNewMessageModal(true)}>
+            <button
+              className="btn btn-primary btn-small"
+              style={{ marginLeft: 10 }}
+              onClick={() => setShowNewMessageModal(true)}
+            >
               ✉️ New
             </button>
           </div>
 
           <div className="filter-tabs-vertical">
-            <button className={`filter-tab ${filterType === 'all' ? 'active' : ''}`} onClick={() => setFilterType('all')}>
+            <button
+              className={`filter-tab ${filterType === "all" ? "active" : ""}`}
+              onClick={() => setFilterType("all")}
+            >
               All
             </button>
-            <button className={`filter-tab ${filterType === 'sms' ? 'active' : ''}`} onClick={() => setFilterType('sms')}>
+            <button
+              className={`filter-tab ${filterType === "sms" ? "active" : ""}`}
+              onClick={() => setFilterType("sms")}
+            >
               📱 SMS
             </button>
-            <button className={`filter-tab ${filterType === 'whatsapp' ? 'active' : ''}`} onClick={() => setFilterType('whatsapp')}>
+            <button
+              className={`filter-tab ${
+                filterType === "whatsapp" ? "active" : ""
+              }`}
+              onClick={() => setFilterType("whatsapp")}
+            >
               💚 WhatsApp
             </button>
-            <button className={`filter-tab ${filterType === 'unread' ? 'active' : ''}`} onClick={() => setFilterType('unread')}>
+            <button
+              className={`filter-tab ${
+                filterType === "unread" ? "active" : ""
+              }`}
+              onClick={() => setFilterType("unread")}
+            >
               🔔 Unread
             </button>
           </div>
@@ -168,11 +194,15 @@ function Messages() {
               filteredConversations.map((conv) => (
                 <div
                   key={conv.conversationId}
-                  className={`conversation-item ${selectedConversation?.conversationId === conv.conversationId ? 'active' : ''} ${conv.unread ? 'unread' : ''}`}
+                  className={`conversation-item ${
+                    selectedConversation?.conversationId === conv.conversationId
+                      ? "active"
+                      : ""
+                  } ${conv.unread ? "unread" : ""}`}
                   onClick={() => setSelectedConversation(conv)}
                 >
                   <div className="conversation-avatar">
-                    {conv.type === 'whatsapp' ? '💚' : '📱'}
+                    {conv.type === "whatsapp" ? "💚" : "📱"}
                   </div>
                   <div className="conversation-info">
                     <div className="conversation-header">
@@ -185,13 +215,17 @@ function Messages() {
                           conv.phoneNumber
                         )}
                       </span>
-                      <span className="conversation-time">{formatTime(conv.lastMessageTime)}</span>
+                      <span className="conversation-time">
+                        {formatTime(conv.lastMessageTime)}
+                      </span>
                     </div>
                     <div className="conversation-preview">
                       {conv.lastMessage}
                     </div>
                   </div>
-                  {conv.unread && <div className="unread-badge">{conv.unreadCount}</div>}
+                  {conv.unread && (
+                    <div className="unread-badge">{conv.unreadCount}</div>
+                  )}
                 </div>
               ))
             )}
@@ -205,7 +239,11 @@ function Messages() {
               <div className="empty-icon">💬</div>
               <h3>Select a conversation</h3>
               <p>Choose a conversation from the list or start a new one</p>
-              <button className="btn btn-primary" onClick={() => setShowNewMessageModal(true)}>
+              <button
+                className="btn btn-primary"
+                style={{ marginTop: "14rem" }}
+                onClick={() => setShowNewMessageModal(true)}
+              >
                 ✉️ Start New Conversation
               </button>
             </div>
@@ -214,24 +252,29 @@ function Messages() {
               <div className="messages-header">
                 <div className="header-info">
                   <div className="header-avatar">
-                    {selectedConversation.type === 'whatsapp' ? '💚' : '📱'}
+                    {selectedConversation.type === "whatsapp" ? "💚" : "📱"}
                   </div>
                   <div>
                     <h3>
                       {selectedConversation.patientName ? (
-                        <PatientLink patNum={selectedConversation.patNum} stopPropagation>
+                        <PatientLink
+                          patNum={selectedConversation.patNum}
+                          stopPropagation
+                        >
                           {selectedConversation.patientName}
                         </PatientLink>
                       ) : (
                         selectedConversation.phoneNumber
                       )}
                     </h3>
-                    <p className="header-phone">{selectedConversation.phoneNumber}</p>
+                    <p className="header-phone">
+                      {selectedConversation.phoneNumber}
+                    </p>
                   </div>
                 </div>
                 <button
                   className="btn btn-secondary btn-small"
-                  onClick={() => navigate('/patients?selectMode=checkout')}
+                  onClick={() => navigate("/patients?selectMode=checkout")}
                 >
                   👤 View Patient
                 </button>
@@ -241,20 +284,26 @@ function Messages() {
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`message ${msg.direction === 'outbound' ? 'sent' : 'received'}`}
+                    className={`message ${
+                      msg.direction === "outbound" ? "sent" : "received"
+                    }`}
                   >
                     <div className="message-bubble">
                       <div className="message-text">{msg.text}</div>
                       <div className="message-meta">
                         <span className="message-time">
-                          {new Date(msg.timestamp).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
+                          {new Date(msg.timestamp).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </span>
-                        {msg.direction === 'outbound' && msg.status && (
+                        {msg.direction === "outbound" && msg.status && (
                           <span className="message-status">
-                            {msg.status === 'delivered' ? '✓✓' : msg.status === 'sent' ? '✓' : '⏱'}
+                            {msg.status === "delivered"
+                              ? "✓✓"
+                              : msg.status === "sent"
+                              ? "✓"
+                              : "⏱"}
                           </span>
                         )}
                       </div>
@@ -277,7 +326,7 @@ function Messages() {
                   onClick={handleSendMessage}
                   disabled={sending || !newMessage.trim()}
                 >
-                  {sending ? '...' : '📤 Send'}
+                  {sending ? "..." : "📤 Send"}
                 </button>
               </div>
             </>
@@ -287,7 +336,10 @@ function Messages() {
 
       {/* New Message Modal */}
       {showNewMessageModal && (
-        <div className="modal-overlay" onClick={() => setShowNewMessageModal(false)}>
+        <div
+          className="modal-overlay"
+          onClick={() => setShowNewMessageModal(false)}
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>✉️ New Message</h3>
 
@@ -295,14 +347,18 @@ function Messages() {
               <label>Message Type</label>
               <div className="type-selector">
                 <button
-                  className={`type-button ${messageType === 'sms' ? 'active' : ''}`}
-                  onClick={() => setMessageType('sms')}
+                  className={`type-button ${
+                    messageType === "sms" ? "active" : ""
+                  }`}
+                  onClick={() => setMessageType("sms")}
                 >
                   📱 SMS
                 </button>
                 <button
-                  className={`type-button ${messageType === 'whatsapp' ? 'active' : ''}`}
-                  onClick={() => setMessageType('whatsapp')}
+                  className={`type-button ${
+                    messageType === "whatsapp" ? "active" : ""
+                  }`}
+                  onClick={() => setMessageType("whatsapp")}
                 >
                   💚 WhatsApp
                 </button>
@@ -343,7 +399,10 @@ function Messages() {
             </div>
 
             <div className="modal-actions">
-              <button className="btn btn-secondary" onClick={() => setShowNewMessageModal(false)}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowNewMessageModal(false)}
+              >
                 Cancel
               </button>
               <button
@@ -351,7 +410,7 @@ function Messages() {
                 onClick={handleNewConversation}
                 disabled={sending}
               >
-                {sending ? 'Sending...' : '📤 Send Message'}
+                {sending ? "Sending..." : "📤 Send Message"}
               </button>
             </div>
           </div>

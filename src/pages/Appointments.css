@@ -1,5 +1,5 @@
 .appointments-page {
-  max-width: 1000px;
+  max-width: 100%;
 }
 
 .appointments-header {
@@ -158,8 +158,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-icon {
@@ -183,13 +187,13 @@
   .appointment-card {
     flex-direction: column;
   }
-  
+
   .appointment-time {
     width: 100%;
     min-width: auto;
     padding: 15px;
   }
-  
+
   .provider-row {
     flex-direction: column;
     gap: 8px;

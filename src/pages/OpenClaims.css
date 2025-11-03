@@ -307,6 +307,7 @@
   font-size: 14px;
   opacity: 0.9;
   line-height: 1.5;
+  color: white;
 }
 
 .loading-state,
@@ -330,8 +331,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-icon {
@@ -355,15 +360,15 @@
   .detail-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .claim-actions {
     flex-direction: column;
   }
-  
+
   .claim-actions .btn {
     width: 100%;
   }
-  
+
   .recovery-info {
     grid-template-columns: 1fr;
   }

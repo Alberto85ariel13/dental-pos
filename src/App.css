@@ -27,6 +27,10 @@
   background-clip: text;
 }
 
+.portal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
 .header-time {
   font-size: 16px;
   color: #666;
@@ -72,7 +76,7 @@
 .main-content {
   background: rgba(255, 255, 255, 0.95);
   padding: 30px;
-  border-radius: 16px;
+  border-radius: 0px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   min-height: 600px;
 }
@@ -81,15 +85,15 @@
   .header {
     padding: 15px 20px;
   }
-  
+
   .header-title {
     font-size: 22px;
   }
-  
+
   .header-time {
     font-size: 14px;
   }
-  
+
   .main-content {
     padding: 20px;
   }

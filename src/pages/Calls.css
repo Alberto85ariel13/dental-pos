@@ -42,7 +42,7 @@
 }
 
 .filter-tab.active {
-  color: #667eea;
+  color: white;
   border-bottom-color: #667eea;
 }
 
@@ -102,7 +102,9 @@
   flex-wrap: wrap;
 }
 
-.call-type, .call-time, .call-duration {
+.call-type,
+.call-time,
+.call-duration {
   font-size: 14px;
   color: #666;
 }
