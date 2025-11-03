@@ -404,7 +404,7 @@ const DentalManagementSystem = () => {
 
   const renderPatientOverview = () => (
     <div className="space-y-6">
-      <div className="bg-[linear-gradient(135deg,#9e78c4_0%,#764ba2_100%)] rounded-xl p-8 text-white">
+      <div className="bg-[#0059D6] rounded-xl p-8 text-white">
         <h2 className="text-3xl font-bold mb-2">
           Welcome, {patientData.name}!
         </h2>
@@ -1556,15 +1556,19 @@ const DentalManagementSystem = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]">
-      <nav className="bg-white shadow-md rounded-lg max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f1f5f9]">
+      <nav className="bg-[#0059D6] shadow-md rounded-lg max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                D
+              <div className="w-28 h-10 rounded-lg flex items-center justify-center">
+                <img
+                  src="/images/logo-primary.png"
+                  alt="App Logo"
+                  className="w-full h-full object-contain rounded-lg"
+                />
               </div>
-              <span className="header-title ml-3">
+              <span className="header-title ml-3 text-white">
                 {currentView === "patient-portal" ? "Patient Portal" : "Office"}
               </span>
             </div>
@@ -1578,15 +1582,15 @@ const DentalManagementSystem = () => {
                 <option value="patient-portal">Patient Portal</option>
                 <option value="office-dashboard">Office Dashboard</option>
               </select> */}
-              <button className="p-2 hover:bg-slate-100 rounded-lg relative">
-                <Bell className="w-5 h-5 text-slate-600" />
+              <button className="p-2 hover:bg-slate-100 rounded-lg relative text-white">
+                <Bell className="w-5 h-5 text-white" />
                 {currentView === "patient-portal" &&
                   patientData.messages.filter((m) => m.unread).length > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
               </button>
-              <button className="p-2 hover:bg-slate-100 rounded-lg">
-                <LogOut className="w-5 h-5 text-slate-600" />
+              <button className="p-2 hover:bg-slate-100 rounded-lg text-white">
+                <LogOut className="w-5 h-5 text-white" />
               </button>
             </div>
           </div>
@@ -1601,7 +1605,7 @@ const DentalManagementSystem = () => {
                 onClick={() => setActiveTab("overview")}
                 className={`px-4 py-2 rounded-lg font-medium ${
                   activeTab === "overview"
-                    ? "bg-[linear-gradient(135deg,#9e78c4_0%,#764ba2_100%)] text-white "
+                    ? "bg-[#0059D6] text-white "
                     : "bg-white text-slate-700"
                 }`}
               >
@@ -1611,7 +1615,7 @@ const DentalManagementSystem = () => {
                 onClick={() => setActiveTab("messages")}
                 className={`px-4 py-2 rounded-lg font-medium relative ${
                   activeTab === "messages"
-                    ? "bg-teal-500 text-white"
+                    ? "bg-[#0059D6] text-white"
                     : "bg-white text-slate-700"
                 }`}
               >
