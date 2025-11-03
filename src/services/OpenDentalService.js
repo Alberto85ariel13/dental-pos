@@ -1115,7 +1115,7 @@ class OpenDentalService {
   }
 
   // ============================================
-  // ADVANCE BNPL INTEGRATION
+  // ADVANCE POS Lending INTEGRATION
   // ============================================
 
   getAdvanceSettings() {
@@ -1123,7 +1123,7 @@ class OpenDentalService {
     return settings ? JSON.parse(settings) : null;
   }
 
-  // Check if BNPL should be offered
+  // Check if POS Lending should be offered
   shouldOfferBNPL(amount) {
     const settings = this.getAdvanceSettings();
     if (!settings || !settings.enabled) return false;
@@ -1135,7 +1135,7 @@ class OpenDentalService {
     try {
       const settings = this.getAdvanceSettings();
       if (!settings || !settings.enabled) {
-        throw new Error('Avvance BNPL not enabled');
+        throw new Error('Avvance POS Lending not enabled');
       }
 
       // Real Avvance API call:

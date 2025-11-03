@@ -23,7 +23,7 @@ function Settings() {
   const [twilioPhoneNumber, setTwilioPhoneNumber] = useState('');
   const [twilioAiEnabled, setTwilioAiEnabled] = useState(true);
   
-  // Avvance (BNPL) settings
+  // Avvance (POS Lending) settings
   const [advanceEnabled, setAdvanceEnabled] = useState(false);
   const [advanceApiKey, setAdvanceApiKey] = useState('');
   const [advanceMinAmount, setAdvanceMinAmount] = useState(500);
@@ -164,7 +164,7 @@ function Settings() {
           className={`settings-tab ${activeTab === 'advance' ? 'active' : ''}`}
           onClick={() => setActiveTab('advance')}
         >
-          💳 Avvance BNPL
+          💳 Avvance POS Lending
         </button>
       </div>
 
@@ -408,7 +408,7 @@ function Settings() {
         </div>
       )}
 
-      {/* Avvance BNPL Settings */}
+      {/* Avvance POS Lending Settings */}
       {activeTab === 'advance' && (
         <div className="settings-content">
           <div className="settings-section">
@@ -421,7 +421,7 @@ function Settings() {
                   checked={advanceEnabled}
                   onChange={(e) => setAdvanceEnabled(e.target.checked)}
                 />
-                <span>Enable Avvance BNPL</span>
+                <span>Enable Avvance POS Lending</span>
               </label>
               <div className="form-hint">
                 Offer flexible payment plans for high-value procedures not covered by insurance
@@ -454,7 +454,7 @@ function Settings() {
                     onChange={(e) => setAdvanceMinAmount(parseInt(e.target.value))}
                   />
                   <div className="form-hint">
-                    Only offer BNPL for procedures above this amount
+                    Only offer POS Lending for procedures above this amount
                   </div>
                 </div>
 
