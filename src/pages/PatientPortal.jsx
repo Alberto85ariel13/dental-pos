@@ -532,7 +532,7 @@ const DentalManagementSystem = () => {
                 </div>
                 <button
                   onClick={openAppointmentModal}
-                  className="px-4 py-2 bg-[linear-gradient(135deg,#9e78c4_0%,#764ba2_100%)] text-white rounded-lg hover:bg-[#7b6ef6]"
+                  className="px-4 py-2 bg-[#0059D6] text-white rounded-lg hover:bg-[#7b6ef6]"
                 >
                   Book Now
                 </button>
@@ -1515,13 +1515,13 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full h-[600px] flex flex-col">
-          <div className="p-6 border-b flex items-center justify-between">
-            <h3 className="text-xl font-bold text-slate-800">Secure Chat</h3>
+          <div className="bg-[#0059D6] p-6 border-b flex items-center justify-between">
+            <h3 className="text-xl font-bold text-white">Secure Chat</h3>
             <button
               onClick={() => setShowChatModal(false)}
               className="p-2 hover:bg-slate-100 rounded-lg"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
 
