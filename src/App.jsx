@@ -41,7 +41,7 @@ function Layout({ children }) {
   return (
     <div className="app-container">
       <header className="header">
-        <div className="header-title">🦷 DentalPro POS</div>
+        <div className="header-title">🦷 Strictly Healthcare</div>
         <div className="header-time">{formatTime(currentTime)}</div>
       </header>
 

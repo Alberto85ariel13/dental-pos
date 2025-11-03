@@ -1570,14 +1570,14 @@ const DentalManagementSystem = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              <select
+              {/* <select
                 value={currentView}
                 onChange={(e) => setCurrentView(e.target.value)}
                 className="px-4 py-2 border rounded-lg"
               >
                 <option value="patient-portal">Patient Portal</option>
                 <option value="office-dashboard">Office Dashboard</option>
-              </select>
+              </select> */}
               <button className="p-2 hover:bg-slate-100 rounded-lg relative">
                 <Bell className="w-5 h-5 text-slate-600" />
                 {currentView === "patient-portal" &&
