@@ -86,19 +86,18 @@
 }
 
 .service-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 20px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s;
-  border: 2px solid transparent;
+  border: 2px solid;
   text-align: center;
+  border-color: #1571c2;
 }
 
 .service-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  border-color: #1571c2;
 }
 
 .service-icon {

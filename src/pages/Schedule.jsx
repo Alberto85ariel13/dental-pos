@@ -137,7 +137,7 @@ function Schedule() {
       <div className="schedule-section">
         <div className="section-label">Procedure *</div>
         <div className="procedure-grid">
-          {procedures.slice(0, 8).map((proc) => (
+          {procedures.map((proc) => (
             <div
               key={proc.code}
               className={`procedure-option ${selectedProcedure?.code === proc.code ? 'selected' : ''}`}
