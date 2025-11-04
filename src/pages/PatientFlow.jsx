@@ -31,13 +31,13 @@ function PatientFlow() {
   ];
 
   const statuses = {
-    scheduled: { label: 'Scheduled', color: '#2196f3', icon: '📅' },
-    waiting: { label: 'Waiting Room', color: '#ff9800', icon: '🪑' },
-    checkedin: { label: 'Checked In', color: '#4caf50', icon: '✓' },
-    inroom: { label: 'In Room', color: '#9c27b0', icon: '🦷' },
-    withdoctor: { label: 'With Doctor', color: '#e91e63', icon: '👨‍⚕️' },
-    checkout: { label: 'Ready for Checkout', color: '#F44336', icon: '💳' },
-    completed: { label: 'Completed', color: '#607d8b', icon: '✅' },
+    Scheduled: { label: 'Scheduled', color: '#2196f3', icon: '📅' },
+    Waiting: { label: 'Waiting Room', color: '#ff9800', icon: '🪑' },
+    Checkedin: { label: 'Checked In', color: '#4caf50', icon: '✓' },
+    Inroom: { label: 'In Room', color: '#9c27b0', icon: '🦷' },
+    Withdoctor: { label: 'With Doctor', color: '#e91e63', icon: '👨‍⚕️' },
+    Checkout: { label: 'Ready for Checkout', color: '#F44336', icon: '💳' },
+    Completed: { label: 'Completed', color: '#607d8b', icon: '✅' },
   };
 
   useEffect(() => {
@@ -51,6 +51,7 @@ function PatientFlow() {
     try {
       setLoading(true);
       const data = await OpenDentalService.getTodayPatients();
+      console.log('Loaded patients:', data);
       setPatients(data);
     } catch (error) {
       console.error('Error loading patients:', error);
@@ -61,7 +62,7 @@ function PatientFlow() {
 
   const handleCheckIn = async (patient) => {
     try {
-      await OpenDentalService.updatePatientStatus(patient.aptNum, 'checkedin', 'waiting');
+      await OpenDentalService.updatePatientStatus(patient.aptNum, 'Checkedin', 'Waiting');
       alert(`✅ ${patient.patientName} checked in successfully!`);
       await loadPatients();
     } catch (error) {
@@ -76,8 +77,8 @@ function PatientFlow() {
     }
 
     try {
-      const newStatus = selectedRoom === 'waiting' ? 'waiting' : 
-                       selectedRoom === 'checkout' ? 'checkout' : 'inroom';
+      const newStatus = selectedRoom === 'waiting' ? 'Waiting' : 
+                       selectedRoom === 'checkout' ? 'Checkout' : 'Inroom';
       
       await OpenDentalService.updatePatientStatus(
         selectedPatient.aptNum, 
@@ -197,7 +198,7 @@ function PatientFlow() {
 
   const openRoomModal = (patient) => {
     setSelectedPatient(patient);
-    setSelectedRoom(patient.currentRoom || 'waiting');
+    setSelectedRoom(patient.currentRoom || 'Waiting');
     setShowRoomModal(true);
   };
 
@@ -344,7 +345,7 @@ function PatientFlow() {
               </div>
 
               <div className="patient-actions">
-                {patient.status === 'scheduled' && (
+                {patient.status === 'Scheduled' && (
                   <button
                     className="btn btn-success"
                     onClick={() => handleCheckIn(patient)}
@@ -353,7 +354,7 @@ function PatientFlow() {
                   </button>
                 )}
                 
-                {patient.status === 'waiting' && (
+                {patient.status === 'Waiting' && (
                   <button
                     className="btn btn-primary"
                     onClick={() => openRoomModal(patient)}
@@ -362,7 +363,7 @@ function PatientFlow() {
                   </button>
                 )}
 
-                {(patient.status === 'checkedin' || patient.status === 'inroom') && (
+                {(patient.status === 'Checkedin' || patient.status === 'Inroom') && (
                   <>
                     <button
                       className="btn btn-secondary"
@@ -372,23 +373,23 @@ function PatientFlow() {
                     </button>
                     <button
                       className="btn btn-success"
-                      onClick={() => handleStatusChange(patient, 'withdoctor')}
+                      onClick={() => handleStatusChange(patient, 'Withdoctor')}
                     >
                       👨‍⚕️ With Doctor
                     </button>
                   </>
                 )}
 
-                {patient.status === 'withdoctor' && (
+                {patient.status === 'Withdoctor' && (
                   <button
                     className="btn btn-primary"
-                    onClick={() => handleStatusChange(patient, 'checkout')}
+                    onClick={() => handleStatusChange(patient, 'Checkout')}
                   >
                     💳 Ready for Checkout
                   </button>
                 )}
 
-                {patient.status === 'checkout' && (
+                {patient.status === 'Checkout' && (
                   <button
                     className="btn btn-success"
                     onClick={() => {
