@@ -1598,8 +1598,8 @@ const DentalManagementSystem = () => {
                 onClick={() => setActiveTab("overview")}
                 className={`px-4 py-2 rounded-lg font-medium ${
                   activeTab === "overview"
-                    ? "bg-[#0A54C2] hover:bg-[#1571C2] text-white "
-                    : "bg-white text-slate-700"
+                    ? "bg-[#0A54C2] hover:bg-[#1571C2] text-white hover:text-white"
+                    : "bg-white hover:bg-[#1571C2] border-[#0A54C2] border-2 hover:text-white"
                 }`}
               >
                 Overview
@@ -1608,8 +1608,8 @@ const DentalManagementSystem = () => {
                 onClick={() => setActiveTab("messages")}
                 className={`px-4 py-2 rounded-lg font-medium relative ${
                   activeTab === "messages"
-                    ? "bg-[#0A54C2] text-white"
-                    : "bg-white text-slate-700"
+                    ? "bg-[#0A54C2] hover:bg-[#1571C2] text-white hover:text-white"
+                    : "bg-white hover:bg-[#1571C2] border-[#0A54C2] border-2 hover:text-white"
                 }`}
               >
                 Messages
