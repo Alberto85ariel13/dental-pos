@@ -40,25 +40,42 @@
 }
 
 .status-card.active {
-  background: #0A54C2;
+  background: #0a54c2;
   color: white;
   border-left-color: transparent;
 }
 
 .drop-hint {
   position: absolute;
-  bottom: 5px;
-  left: 0;
-  right: 0;
-  font-size: 11px;
-  color: #667eea;
-  font-weight: 600;
-  animation: pulse 1s infinite;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.84);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.status-card.drag-over .drop-hint {
+  opacity: 1;
+}
+
+.status-card.drag-over {
+  background: rgba(0, 0, 0, 0.15);
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .status-icon {
@@ -110,7 +127,7 @@
   justify-content: center;
   min-width: 100px;
   padding: 15px;
-  background: #0A54C2;
+  background: #0a54c2;
   border-radius: 10px;
   color: white;
 }
@@ -249,8 +266,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -316,7 +337,7 @@
 }
 
 .room-option.selected {
-  background: #0A54C2;
+  background: #0a54c2;
   color: white;
   border-color: transparent;
 }
@@ -427,7 +448,7 @@
 }
 
 .eligibility-item .value.inactive {
-  color: #F44336;
+  color: #f44336;
 }
 
 .eligibility-timestamp {
@@ -460,8 +481,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-icon {
