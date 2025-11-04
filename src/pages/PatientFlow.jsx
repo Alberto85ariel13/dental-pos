@@ -27,7 +27,7 @@ function PatientFlow() {
     { id: 'xray', name: '📸 X-Ray Room', color: '#ff9800' },
     { id: 'hygiene1', name: '✨ Hygiene 1', color: '#9c27b0' },
     { id: 'hygiene2', name: '✨ Hygiene 2', color: '#9c27b0' },
-    { id: 'checkout', name: '💳 Checkout', color: '#f44336' },
+    { id: 'checkout', name: '💳 Checkout', color: '#F44336' },
   ];
 
   const statuses = {
@@ -36,7 +36,7 @@ function PatientFlow() {
     checkedin: { label: 'Checked In', color: '#4caf50', icon: '✓' },
     inroom: { label: 'In Room', color: '#9c27b0', icon: '🦷' },
     withdoctor: { label: 'With Doctor', color: '#e91e63', icon: '👨‍⚕️' },
-    checkout: { label: 'Ready for Checkout', color: '#f44336', icon: '💳' },
+    checkout: { label: 'Ready for Checkout', color: '#F44336', icon: '💳' },
     completed: { label: 'Completed', color: '#607d8b', icon: '✅' },
   };
 
@@ -224,7 +224,10 @@ function PatientFlow() {
           <h2 className="page-title">🏥 Patient Flow - {new Date().toLocaleDateString()}</h2>
           <p className="page-subtitle">{patients.length} patients scheduled today</p>
         </div>
-        <button className="btn btn-primary" onClick={loadPatients}>
+        
+        <button className="btn btn-secondary"
+          style={{ maxWidth: "15rem" }}
+          onClick={loadPatients}>
           🔄 Refresh
         </button>
       </div>

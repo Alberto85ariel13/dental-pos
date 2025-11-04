@@ -161,7 +161,7 @@
 }
 
 .overdue-text {
-  color: #f44336;
+  color: #F44336;
 }
 
 .procedures-section {
@@ -419,7 +419,7 @@
 }
 
 .aging-bucket.severe {
-  border-left-color: #f44336;
+  border-left-color: #F44336;
 }
 
 .bucket-label {

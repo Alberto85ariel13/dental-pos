@@ -40,7 +40,7 @@ function Appointments() {
       confirmed: "#4caf50",
       arrived: "#ff9800",
       completed: "#2196f3",
-      cancelled: "#f44336",
+      cancelled: "#F44336",
     };
     return colors[status.toLowerCase()] || "#999";
   };

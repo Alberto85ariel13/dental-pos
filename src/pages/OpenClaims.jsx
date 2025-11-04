@@ -92,7 +92,7 @@ function OpenClaims() {
     const colors = {
       pending: "#ff9800",
       sent: "#2196f3",
-      overdue: "#f44336",
+      overdue: "#F44336",
       paid: "#4caf50",
     };
     return colors[status.toLowerCase()] || "#999";

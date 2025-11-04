@@ -28,7 +28,7 @@ function CallCenter() {
   const dispositions = {
     answered: { label: 'Answered', color: '#4caf50', icon: '📞' },
     voicemail: { label: 'Voicemail', color: '#ff9800', icon: '📬' },
-    no_answer: { label: 'No Answer', color: '#f44336', icon: '📵' },
+    no_answer: { label: 'No Answer', color: '#F44336', icon: '📵' },
     busy: { label: 'Busy', color: '#9c27b0', icon: '🔴' },
     payment_received: { label: 'Payment Received', color: '#2196f3', icon: '💳' },
     scheduled: { label: 'Scheduled', color: '#00bcd4', icon: '📅' },

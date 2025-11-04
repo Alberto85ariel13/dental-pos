@@ -9,7 +9,7 @@ function Schedule() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('09:00');
-  const [duration, setDuration] = useState(60);
+  const [duration, setDuration] = useState(30);
   const [selectedProcedure, setSelectedProcedure] = useState(null);
   const [note, setNote] = useState('');
   const [procedures, setProcedures] = useState([]);

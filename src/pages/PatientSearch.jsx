@@ -86,9 +86,7 @@ function PatientSearch() {
             >
               <div className="patient-header">
                 <div className="patient-name">
-                  <PatientLink patNum={patient.patNum} stopPropagation>
                     {patient.fName} {patient.lName}
-                  </PatientLink>
                 </div>
                 <div className="patient-id">#{patient.patNum}</div>
               </div>

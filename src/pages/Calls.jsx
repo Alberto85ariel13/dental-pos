@@ -95,8 +95,8 @@ function Calls() {
     const colors = {
       completed: "#4caf50",
       "no-answer": "#ff9800",
-      busy: "#f44336",
-      failed: "#f44336",
+      busy: "#F44336",
+      failed: "#F44336",
       voicemail: "#2196f3",
       "in-progress": "#9c27b0",
     };
