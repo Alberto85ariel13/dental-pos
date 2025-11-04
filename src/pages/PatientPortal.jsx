@@ -952,12 +952,10 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6 border-b flex items-center justify-between sticky top-0 bg-white">
+          <div className="p-6 border-b flex items-center justify-between sticky top-0 bg-[#0A54C2]">
             <div>
-              <h3 className="text-2xl font-bold text-slate-800">
-                Balance Details
-              </h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="text-2xl font-bold text-white">Balance Details</h3>
+              <p className="text-sm text-gray-100">
                 Outstanding balance breakdown
               </p>
             </div>
@@ -965,7 +963,7 @@ const DentalManagementSystem = () => {
               onClick={() => setShowClaimDetailsModal(false)}
               className="p-2 hover:bg-slate-100 rounded-lg"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
 
@@ -1373,7 +1371,7 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-          <div className="p-6 border-b bg-[#0A54C2]">
+          <div className="p-6 border-b bg-[#0A54C2] rounded-t-xl">
             <h3 className="text-2xl font-bold text-white">Make Payment</h3>
           </div>
 
@@ -1437,13 +1435,13 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-          <div className="p-6 border-b flex items-center justify-between">
-            <h3 className="text-2xl font-bold text-slate-800">Add Card</h3>
+          <div className="p-6 border-b flex items-center justify-between bg-[#0A54C2] rounded-t-xl">
+            <h3 className="text-2xl font-bold text-white">Add Card</h3>
             <button
               onClick={() => setShowCardModal(false)}
               className="p-2 hover:bg-slate-100 rounded-lg"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
 
@@ -1510,7 +1508,7 @@ const DentalManagementSystem = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full h-[600px] flex flex-col">
-          <div className="bg-[#0A54C2] p-6 border-b flex items-center justify-between">
+          <div className="bg-[#0A54C2] p-6 border-b flex items-center justify-between rounded-t-xl">
             <h3 className="text-xl font-bold text-white">Secure Chat</h3>
             <button
               onClick={() => setShowChatModal(false)}
@@ -1552,7 +1550,7 @@ const DentalManagementSystem = () => {
 
   return (
     <div className="min-h-screen bg-[#f1f5f9]">
-      <nav className="bg-[#0A54C2] shadow-md rounded-lg max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-[#0A54C2] shadow-md rounded-xl mx-auto px-4 sm:px-6 lg:px-8 mb-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -1592,7 +1590,7 @@ const DentalManagementSystem = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto pb-8">
         {currentView === "patient-portal" ? (
           <>
             <div className="flex gap-4 mb-6">

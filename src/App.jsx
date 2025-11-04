@@ -46,7 +46,7 @@ function Layout({ children }) {
       minute: "2-digit",
     });
 
-  if (isPortal) return <main className="main-content portal">{children}</main>;
+  if (isPortal) return <main className="app-container">{children}</main>;
 
   return (
     <div className="app-container">
