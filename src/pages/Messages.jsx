@@ -272,12 +272,15 @@ function Messages() {
                     </p>
                   </div>
                 </div>
-                <button
-                  className="btn btn-secondary btn-small"
-                  onClick={() => navigate("/patients?selectMode=checkout")}
-                >
-                  👤 View Patient
-                </button>
+                <div className="header-actions">
+                  <button
+                    className="btn btn-secondary"
+                    style={{ width: "15rem" }}
+                    onClick={() => navigate("/patients?selectMode=checkout")}
+                  >
+                    View Patient
+                  </button>
+                </div>
               </div>
 
               <div className="messages-content">

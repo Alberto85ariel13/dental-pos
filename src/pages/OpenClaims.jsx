@@ -169,9 +169,15 @@ function OpenClaims() {
             )}
           </p>
         </div>
-        <button className="btn btn-primary" onClick={loadClaims}>
-          🔄 Refresh
-        </button>
+        <div className="header-actions">
+          <button
+            className="btn btn-secondary"
+            style={{ width: "15rem" }}
+            onClick={loadClaims}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div className="filter-section">

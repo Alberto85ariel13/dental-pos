@@ -118,7 +118,7 @@ function Checkout() {
               className="service-card"
               onClick={() => addToCart(proc)}
             >
-              <div className="service-icon">🦷</div>
+              {/* <div className="service-icon">🦷</div> */}
               <div className="service-code">{proc.code}</div>
               <div className="service-description">{proc.description}</div>
               <div className="service-fee">${proc.fee}</div>

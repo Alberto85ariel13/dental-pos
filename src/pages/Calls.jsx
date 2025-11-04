@@ -139,7 +139,7 @@ function Calls() {
             style={{ width: "15rem" }}
             onClick={loadCalls}
           >
-            🔄 Refresh
+            Refresh
           </button>
           <button
             className="btn btn-primary"

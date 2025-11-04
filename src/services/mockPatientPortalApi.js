@@ -141,7 +141,7 @@ const normalizeAppointmentPayload = (appointment) => {
   } else if (date && time) {
     aptDateTime = toIsoDateTime(date, time);
   } else if (date) {
-    aptDateTime = toIsoDateTime(date, '09:00 AM');
+    aptDateTime = toIsoDateTime(date, '09:30 AM');
     time = formatTimeFromIso(aptDateTime);
   }
 
@@ -159,7 +159,7 @@ const normalizeAppointmentPayload = (appointment) => {
   const procedureDescription = appointment.procedureDescription ?? appointmentType;
 
   const resolvedDate = date ?? (aptDateTime ? aptDateTime.split('T')[0] : null);
-  const resolvedTime = time ?? (aptDateTime ? formatTimeFromIso(aptDateTime) : '09:00 AM');
+  const resolvedTime = time ?? (aptDateTime ? formatTimeFromIso(aptDateTime) : '09:30 AM');
 
   return {
     id: appointment.id,

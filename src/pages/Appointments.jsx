@@ -68,7 +68,7 @@ function Appointments() {
             style={{ width: "15rem" }}
             onClick={loadAppointments}
           >
-            🔄 Refresh
+            Refresh
           </button>
           <button
             className="btn btn-primary text-white"

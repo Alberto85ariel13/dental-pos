@@ -254,7 +254,7 @@ function PatientFlow() {
           style={{ maxWidth: "15rem" }}
           onClick={loadPatients}
         >
-          🔄 Refresh
+          Refresh
         </button>
       </div>
 

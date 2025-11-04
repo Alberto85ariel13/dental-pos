@@ -220,19 +220,30 @@ class OpenDentalService {
 
   async getProcedureCodes() {
     return [
-      { code: 'D0120', description: 'Periodic Oral Evaluation', fee: 85 },
-      { code: 'D0150', description: 'Comprehensive Oral Evaluation', fee: 100 },
-      { code: 'D0210', description: 'Complete Intraoral Radiographs', fee: 200 },
+      // Most Common (High Frequency Daily Use)
+      { code: 'D0120', description: 'Periodic Oral Evaluation', fee: 150 },
       { code: 'D1110', description: 'Prophylaxis - Adult', fee: 120 },
       { code: 'D1120', description: 'Prophylaxis - Child', fee: 85 },
+      { code: 'D0140', description: 'Limited Oral Evaluation – Problem Focused', fee: 120 },
+      { code: 'D0210', description: 'Complete Intraoral Radiographs', fee: 47 },
+      { code: 'D0330', description: 'Panoramic Radiograph', fee: 100 },
+      { code: 'D0150', description: 'Comprehensive Oral Evaluation', fee: 150 },
+      { code: 'D9110', description: 'Palliative (Emergency) Treatment of Dental Pain', fee: 150 },
+      // Moderately Common (Weekly / Case-Based)
+      { code: 'D2330', description: 'Resin - One Surface', fee: 195 },
       { code: 'D2140', description: 'Amalgam - One Surface', fee: 180 },
       { code: 'D2150', description: 'Amalgam - Two Surfaces', fee: 220 },
-      { code: 'D2330', description: 'Resin - One Surface', fee: 195 },
-      { code: 'D2740', description: 'Crown - Porcelain/Ceramic', fee: 1500 },
-      { code: 'D3310', description: 'Root Canal - Anterior', fee: 900 },
-      { code: 'D3320', description: 'Root Canal - Bicuspid', fee: 1100 },
       { code: 'D7140', description: 'Extraction - Erupted Tooth', fee: 250 },
+      // Less Common (Specialized or High-Value Restorative)
+      { code: 'D2740', description: 'Crown - Porcelain/Ceramic', fee: 1500 },
+      { code: 'D3320', description: 'Root Canal - Bicuspid', fee: 1100 },
+      { code: 'D3330', description: 'Root Canal — Molar', fee: 1400 },
+      { code: 'D3310', description: 'Root Canal - Anterior', fee: 1600 },
+      // Occasional / Cosmetic / Administrative
       { code: 'D9972', description: 'External Bleaching', fee: 450 },
+      { code: 'D9430', description: 'Office Visit – After Regular Hours', fee: 100 },
+      { code: 'D9215', description: 'Local Anaesthesia not in conjunction with operative procedure', fee: 50 },
+      { code: 'D9999', description: 'Miscellaneous / courtesy / promotional', fee: 0 },
     ];
   }
 
