@@ -152,13 +152,17 @@ function Messages() {
 
           <div className="filter-tabs-vertical">
             <button
-              className={`filter-tab ${filterType === "all" ? "active" : ""}`}
+              className={`filter-tab ${
+                filterType === "all" ? "active" : ""
+              } text-black`}
               onClick={() => setFilterType("all")}
             >
               All
             </button>
             <button
-              className={`filter-tab ${filterType === "sms" ? "active" : ""}`}
+              className={`filter-tab ${
+                filterType === "sms" ? "active" : ""
+              } text-black`}
               onClick={() => setFilterType("sms")}
             >
               📱 SMS
@@ -166,7 +170,7 @@ function Messages() {
             <button
               className={`filter-tab ${
                 filterType === "whatsapp" ? "active" : ""
-              }`}
+              } text-black`}
               onClick={() => setFilterType("whatsapp")}
             >
               💚 WhatsApp
@@ -174,7 +178,7 @@ function Messages() {
             <button
               className={`filter-tab ${
                 filterType === "unread" ? "active" : ""
-              }`}
+              } text-black`}
               onClick={() => setFilterType("unread")}
             >
               🔔 Unread
@@ -240,8 +244,7 @@ function Messages() {
               <h3>Select a conversation</h3>
               <p>Choose a conversation from the list or start a new one</p>
               <button
-                className="btn btn-primary"
-                style={{ marginTop: "14rem" }}
+                className="btn btn-primary mt-6"
                 onClick={() => setShowNewMessageModal(true)}
               >
                 ✉️ Start New Conversation
@@ -292,9 +295,23 @@ function Messages() {
                     }`}
                   >
                     <div className="message-bubble">
-                      <div className="message-text">{msg.text}</div>
+                      <div
+                        className={`message-text ${
+                          msg.direction === "inbound"
+                            ? "text-black"
+                            : "text-white"
+                        }`}
+                      >
+                        {msg.text}
+                      </div>
                       <div className="message-meta">
-                        <span className="message-time">
+                        <span
+                          className={`message-time ${
+                            msg.direction === "inbound"
+                              ? "text-[#999]"
+                              : "text-white"
+                          }`}
+                        >
                           {new Date(msg.timestamp).toLocaleTimeString("en-US", {
                             hour: "2-digit",
                             minute: "2-digit",

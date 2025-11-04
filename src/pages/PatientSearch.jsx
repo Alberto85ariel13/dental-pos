@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import OpenDentalService from '../services/OpenDentalService';
-import PatientLink from '../components/PatientLink';
-import './PatientSearch.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import OpenDentalService from "../services/OpenDentalService";
+import PatientLink from "../components/PatientLink";
+import "./PatientSearch.css";
 
 function PatientSearch() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const selectMode = searchParams.get('selectMode'); // 'true', 'schedule', or null
-  
-  const [searchQuery, setSearchQuery] = useState('');
+  const selectMode = searchParams.get("selectMode"); // 'true', 'schedule', or null
+
+  const [searchQuery, setSearchQuery] = useState("");
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    searchPatients('');
+    searchPatients("");
   }, []);
 
   const searchPatients = async (query) => {
@@ -23,7 +23,7 @@ function PatientSearch() {
       const results = await OpenDentalService.searchPatients(query);
       setPatients(results);
     } catch (error) {
-      console.error('Error searching patients:', error);
+      console.error("Error searching patients:", error);
     } finally {
       setLoading(false);
     }
@@ -36,14 +36,17 @@ function PatientSearch() {
   };
 
   const handleSelectPatient = (patient) => {
-    if (selectMode === 'schedule') {
+    if (selectMode === "schedule") {
       // Store patient for scheduling and navigate back
-      sessionStorage.setItem('selectedPatientForSchedule', JSON.stringify(patient));
-      navigate('/schedule');
-    } else if (selectMode === 'true' || selectMode === 'checkout') {
+      sessionStorage.setItem(
+        "selectedPatientForSchedule",
+        JSON.stringify(patient)
+      );
+      navigate("/schedule");
+    } else if (selectMode === "true" || selectMode === "checkout") {
       // Store patient for checkout and navigate back
-      sessionStorage.setItem('selectedPatient', JSON.stringify(patient));
-      navigate('/');
+      sessionStorage.setItem("selectedPatient", JSON.stringify(patient));
+      navigate("/");
     } else {
       // Just show patient selected (default behavior)
       alert(`Patient selected: ${patient.fName} ${patient.lName}`);
@@ -85,8 +88,8 @@ function PatientSearch() {
               onClick={() => handleSelectPatient(patient)}
             >
               <div className="patient-header">
-                <div className="patient-name">
-                    {patient.fName} {patient.lName}
+                <div className="patient-name mr-2">
+                  {patient.fName} {patient.lName}
                 </div>
                 <div className="patient-id">#{patient.patNum}</div>
               </div>
@@ -107,7 +110,7 @@ function PatientSearch() {
                   <span className="detail-icon">💰</span>
                   <span
                     className={`detail-text ${
-                      patient.balance > 0 ? 'balance-owed' : 'balance-clear'
+                      patient.balance > 0 ? "balance-owed" : "balance-clear"
                     }`}
                   >
                     ${patient.balance.toFixed(2)}

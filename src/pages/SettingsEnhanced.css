@@ -1,5 +1,5 @@
 .settings-page-enhanced {
-  max-width: 1000px;
+  max-width: 100%;
 }
 
 .page-title {
@@ -31,12 +31,12 @@
 }
 
 .settings-tab:hover {
-  color: #667eea;
+  color: #1571C2;
 }
 
 .settings-tab.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  color: #1571C2;
+  border-bottom-color: #1571C2;
 }
 
 .settings-content {
@@ -57,7 +57,7 @@
 .settings-section h4 {
   font-size: 16px;
   font-weight: 700;
-  color: #667eea;
+  color: #1571C2;
   margin: 20px 0 15px 0;
 }
 
@@ -84,7 +84,7 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #1571C2;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -185,15 +185,15 @@
   .settings-tabs {
     flex-wrap: nowrap;
   }
-  
+
   .settings-content {
     padding: 20px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .action-buttons .btn {
     width: 100%;
   }

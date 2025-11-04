@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import OpenDentalService from "../services/OpenDentalService";
 import PatientLink from "../components/PatientLink";
 import "./OpenClaims.css";
+import { capitalizeStatus } from "../services/capitalizeStatus";
 
 function OpenClaims() {
   const [claims, setClaims] = useState([]);
@@ -322,7 +323,7 @@ function OpenClaims() {
                   className="status-badge"
                   style={{ backgroundColor: getStatusColor(claim.status) }}
                 >
-                  {claim.status}
+                  {capitalizeStatus(claim.status)}
                   {claim.status === "overdue" &&
                     ` (${getDaysOverdue(claim.dueDate)} days)`}
                 </div>

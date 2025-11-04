@@ -36,13 +36,42 @@ function Appointments() {
 
   const getStatusColor = (status) => {
     const colors = {
-      scheduled: "#667eea",
+      scheduled: "#2196f3",
       confirmed: "#4caf50",
       arrived: "#ff9800",
-      completed: "#2196f3",
+      completed: "#607d8b",
       cancelled: "#F44336",
+      waiting: "#ff9800",
+      checkedin: "#4caf50",
+      inroom: "#9c27b0",
+      withdoctor: "#e91e63",
+      checkout: "#F44336",
     };
     return colors[status.toLowerCase()] || "#999";
+  };
+
+  const normalizeStatusName = (status) => {
+    if (!status) return "";
+
+    const normalized = status.toLowerCase();
+
+    const map = {
+      scheduled: "Scheduled",
+      confirmed: "Confirmed",
+      arrived: "Arrived",
+      completed: "Completed",
+      cancelled: "Cancelled",
+      waiting: "Waiting",
+      checkedin: "Checked In",
+      inroom: "In Room",
+      withdoctor: "With Doctor",
+      checkout: "Checkout",
+    };
+
+    return (
+      map[normalized] ||
+      normalized.charAt(0).toUpperCase() + normalized.slice(1)
+    );
   };
 
   return (
@@ -71,11 +100,24 @@ function Appointments() {
             Refresh
           </button>
           <button
-            className="btn btn-primary text-white"
+            className="btn btn-primary text-white flex items-center justify-center gap-2"
             style={{ width: "15rem" }}
             onClick={() => (window.location.href = "/schedule")}
           >
-            ➕ Schedule New
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              width="25"
+              height="25"
+            >
+              <path
+                fillRule="evenodd"
+                d="M12 5c.552 0 1 .448 1 1v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H6a1 1 0 1 1 0-2h5V6c0-.552.448-1 1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Schedule New
           </button>
         </div>
       </div>
@@ -98,9 +140,7 @@ function Appointments() {
               <div
                 className="appointment-time"
                 style={{
-                  background: `linear-gradient(135deg, ${getStatusColor(
-                    apt.status
-                  )} 0%, ${getStatusColor(apt.status)}dd 100%)`,
+                  background: getStatusColor(apt.status),
                 }}
               >
                 <div className="time-text">{formatTime(apt.aptDateTime)}</div>
@@ -138,9 +178,9 @@ function Appointments() {
 
                 <div
                   className="status-badge"
-                  style={{ backgroundColor: getStatusColor(apt.status) }}
+                  style={{ background: getStatusColor(apt.status) }}
                 >
-                  {apt.status}
+                  {normalizeStatusName(apt.status)}
                 </div>
               </div>
             </div>

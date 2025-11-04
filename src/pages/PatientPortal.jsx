@@ -1556,7 +1556,7 @@ const DentalManagementSystem = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="w-28 h-10 rounded-lg flex items-center justify-center">
+              <div className="w-36 h-10 rounded-lg flex items-center justify-center">
                 <img
                   src="/images/logo-primary.png"
                   alt="App Logo"

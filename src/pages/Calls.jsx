@@ -91,6 +91,74 @@ function Calls() {
     }
   };
 
+  const normalizeStatus = (status) => {
+    if (!status) return "";
+
+    const key = status.toLowerCase();
+
+    const map = {
+      completed: "Completed",
+      "no-answer": "No Answer",
+      busy: "Busy",
+      failed: "Failed",
+      voicemail: "Voicemail",
+      "in-progress": "In Progress",
+    };
+
+    if (map[key]) return map[key];
+
+    // fallback genérico: in_progress → In Progress, some-status → Some Status
+    return key
+      .split(/[_-]/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const normalizeDisposition = (disposition) => {
+    if (!disposition) return "";
+
+    const key = disposition.toLowerCase();
+
+    const map = {
+      answered: "Answered",
+      "no-answer": "No Answer",
+      voicemail: "Voicemail",
+      busy: "Busy",
+      failed: "Failed",
+      payment_collected: "Payment Collected",
+      sms_sent: "SMS Sent",
+      callback_requested: "Callback Requested",
+    };
+
+    if (map[key]) return map[key];
+
+    return key
+      .split(/[_-]/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const normalizePurpose = (purpose) => {
+    if (!purpose) return "";
+
+    const key = purpose.toLowerCase();
+
+    const map = {
+      payment_reminder: "Payment Reminder",
+      appointment_reminder: "Appointment Reminder",
+      appointment_confirmation: "Appointment Confirmation",
+      follow_up: "Follow Up",
+      general: "General Call",
+    };
+
+    if (map[key]) return map[key];
+
+    return key
+      .split(/[_-]/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   const getStatusColor = (status) => {
     const colors = {
       completed: "#4caf50",
@@ -129,8 +197,9 @@ function Calls() {
         <div>
           <h2 className="page-title">📞 Call Management</h2>
           <p className="page-subtitle">
-            {calls.length} total calls •{" "}
-            {calls.filter((c) => c.status === "completed").length} completed
+            {calls.length} Total Calls •{" "}
+            {calls.filter((c) => c.status === "completed").length}{" "}
+            {normalizeStatus("completed")}
           </p>
         </div>
         <div className="header-actions">
@@ -142,11 +211,20 @@ function Calls() {
             Refresh
           </button>
           <button
-            className="btn btn-primary"
+            className="btn btn-primary text-white flex items-center justify-center gap-2"
             style={{ width: "15rem" }}
             onClick={() => setShowMakeCallModal(true)}
           >
-            📞 Make Call
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              width="25"
+              height="25"
+            >
+              <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l1.95-1.95a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1v3.09a1 1 0 0 1-1 1A17 17 0 0 1 3 5a1 1 0 0 1 1-1h3.09a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.24 1.01l-1.8 1.8z" />
+            </svg>
+            Make Call
           </button>
         </div>
       </div>
@@ -218,7 +296,9 @@ function Calls() {
                     )}
                   </div>
                   <div className="call-details">
-                    <span className="call-type">{call.purpose}</span>
+                    <span className="call-type">
+                      {normalizePurpose(call.purpose)}
+                    </span>
                     <span className="call-time">
                       {new Date(call.timestamp).toLocaleString()}
                     </span>
@@ -233,7 +313,7 @@ function Calls() {
                       className="disposition-badge"
                       style={{ backgroundColor: getStatusColor(call.status) }}
                     >
-                      {call.disposition}
+                      {normalizeDisposition(call.disposition)}
                     </span>
                     {call.aiRecommendation && (
                       <span className="ai-recommendation">
@@ -247,7 +327,7 @@ function Calls() {
               <div className="call-actions">
                 {call.hasRecording && (
                   <button
-                    className="btn btn-secondary btn-small"
+                    className="btn btn-secondary btn-small w-16"
                     onClick={() => handlePlayRecording(call)}
                     disabled={playingRecording === call.callSid}
                   >
@@ -258,7 +338,7 @@ function Calls() {
                 )}
                 {call.hasTranscript && (
                   <button
-                    className="btn btn-secondary btn-small"
+                    className="btn btn-secondary btn-small w-40"
                     onClick={() => handleViewTranscript(call)}
                   >
                     📄 Transcript
@@ -267,7 +347,7 @@ function Calls() {
                 {(call.disposition === "no-answer" ||
                   call.disposition === "voicemail") && (
                   <button
-                    className="btn btn-primary btn-small"
+                    className="btn btn-primary btn-small w-24"
                     onClick={() => {
                       setCallToNumber(call.toNumber);
                       setCallToPatient(call.patientName);

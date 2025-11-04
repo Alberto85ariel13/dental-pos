@@ -1,5 +1,5 @@
 .checkout-page {
-  max-width: 1200px;
+  max-width: 100%;
 }
 
 .section {
@@ -24,7 +24,7 @@
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #1571c2;
 }
 
 .patient-card.selected {
@@ -58,7 +58,7 @@
 }
 
 .select-patient-box:hover {
-  border-color: #667eea;
+  border-color: #1571c2;
   background: rgba(102, 126, 234, 0.05);
 }
 
@@ -70,7 +70,7 @@
 .select-text {
   font-size: 18px;
   font-weight: 600;
-  color: #667eea;
+  color: #1571c2;
   margin-bottom: 8px;
 }
 
@@ -98,7 +98,7 @@
 .service-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  border-color: #667eea;
+  border-color: #1571c2;
 }
 
 .service-icon {
@@ -108,7 +108,7 @@
 
 .service-code {
   font-weight: 600;
-  color: #667eea;
+  color: #1571c2;
   margin-bottom: 8px;
   font-size: 14px;
 }
@@ -227,12 +227,12 @@
 }
 
 .btn-secondary:hover {
-  background: #1571C2;
+  background: #1571c2;
   color: white;
 }
 
 .btn-danger {
-  background: #F44336;
+  background: #f44336;
   color: white;
 }
 
